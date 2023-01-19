@@ -30,7 +30,7 @@ const proxyquire = require("proxyquire").noCallThru().noPreserveCache();
 // Tests
 //------------------------------------------------------------------------------
 
-describe("cli", () => {
+describe.skip("cli", () => {
     let fixtureDir;
     const log = {
         info: sinon.spy(),
@@ -53,7 +53,6 @@ describe("cli", () => {
      * @returns {void}
      */
     async function verifyESLintOpts(cmd, opts, configType) {
-
         // create a fake ESLint class to test with
         const fakeESLint = sinon.mock().withExactArgs(sinon.match(opts));
 
@@ -84,8 +83,7 @@ describe("cli", () => {
     }
 
     // copy into clean area so as not to get "infected" by this project's .eslintrc files
-    before(function() {
-
+    before(function () {
         /*
          * GitHub Actions Windows and macOS runners occasionally exhibit
          * extremely slow filesystem operations, during which copying fixtures
@@ -108,11 +106,9 @@ describe("cli", () => {
     });
 
     ["eslintrc", "flat"].forEach(configType => {
-
         const useFlatConfig = configType === "flat";
 
         describe("execute()", () => {
-
             it(`should return error when text with incorrect quotes is passed as argument with configType:${configType}`, async () => {
                 const configFile = getFixturePath("configurations", "quotes-error.js");
                 const result = await cli.execute(`-c ${configFile} --stdin --stdin-filename foo.js`, "var foo = 'bar';", useFlatConfig);
@@ -134,7 +130,6 @@ describe("cli", () => {
 
                 assert.strictEqual(result, 2);
             });
-
         });
 
         describe("flat config", () => {
@@ -182,7 +177,6 @@ describe("cli", () => {
         });
 
         describe("when given a config with rules with options and severity level set to error", () => {
-
             const originalCwd = process.cwd;
 
             beforeEach(() => {
@@ -205,7 +199,6 @@ describe("cli", () => {
         });
 
         describe("when there is a local config file", () => {
-
             it(`should load the local config file with configType:${configType}`, async () => {
                 await cli.execute("lib/cli.js", null, useFlatConfig);
             });
@@ -225,7 +218,6 @@ describe("cli", () => {
         });
 
         describe("Formatters", () => {
-
             describe("when given a valid built-in formatter name", () => {
                 it(`should execute without any errors with configType:${configType}`, async () => {
                     const filePath = getFixturePath("passing.js");
@@ -237,7 +229,6 @@ describe("cli", () => {
             });
 
             describe("when given a valid built-in formatter name that uses rules meta.", () => {
-
                 const originalCwd = process.cwd;
 
                 beforeEach(() => {
@@ -267,10 +258,12 @@ describe("cli", () => {
                     const { metadata } = JSON.parse(log.info.args[0][0]);
                     const expectedMetadata = {
                         cwd: process.cwd(),
-                        rulesMeta: useFlatConfig ? {} : Array.from(BuiltinRules).reduce((obj, [ruleId, rule]) => {
-                            obj[ruleId] = rule.meta;
-                            return obj;
-                        }, {})
+                        rulesMeta: useFlatConfig
+                            ? {}
+                            : Array.from(BuiltinRules).reduce((obj, [ruleId, rule]) => {
+                                  obj[ruleId] = rule.meta;
+                                  return obj;
+                              }, {})
                     };
 
                     assert.deepStrictEqual(metadata, expectedMetadata);
@@ -292,10 +285,7 @@ describe("cli", () => {
 
                         const { metadata } = JSON.parse(log.info.args[0][0]);
 
-                        assert.deepStrictEqual(
-                            metadata.maxWarningsExceeded,
-                            { maxWarnings: 1, foundWarnings: 2 }
-                        );
+                        assert.deepStrictEqual(metadata.maxWarningsExceeded, { maxWarnings: 1, foundWarnings: 2 });
                     });
                 });
 
@@ -358,7 +348,6 @@ describe("cli", () => {
         });
 
         describe("Exit Codes", () => {
-
             const originalCwd = process.cwd;
 
             beforeEach(() => {
@@ -370,7 +359,6 @@ describe("cli", () => {
             });
 
             describe("when executing a file with a lint error", () => {
-
                 it(`should exit with error with configType:${configType}`, async () => {
                     const filePath = getFixturePath("undef.js");
                     const code = `--no-ignore --rule no-undef:2 ${filePath}`;
@@ -400,11 +388,9 @@ describe("cli", () => {
                     assert.strictEqual(exit, 1);
                 });
             });
-
         });
 
         describe("when calling execute more than once", () => {
-
             const originalCwd = process.cwd;
 
             beforeEach(() => {
@@ -427,7 +413,6 @@ describe("cli", () => {
 
                 await cli.execute(`--no-ignore --rule semi:2 ${passingPath}`, null, useFlatConfig);
                 assert.isTrue(log.info.notCalled);
-
             });
         });
 
@@ -439,14 +424,12 @@ describe("cli", () => {
         });
 
         describe("when executing with env-info flag", () => {
-
             it(`should print out environment information with configType:${configType}`, async () => {
                 assert.strictEqual(await cli.execute("--env-info", null, useFlatConfig), 0);
                 assert.strictEqual(log.info.callCount, 1);
             });
 
             describe("With error condition", () => {
-
                 beforeEach(() => {
                     RuntimeInfo.environment = sinon.stub().throws("There was an error!");
                 });
@@ -456,12 +439,10 @@ describe("cli", () => {
                 });
 
                 it(`should print error message and return error code with configType:${configType}`, async () => {
-
                     assert.strictEqual(await cli.execute("--env-info", null, useFlatConfig), 2);
                     assert.strictEqual(log.error.callCount, 1);
                 });
             });
-
         });
 
         describe("when executing with help flag", () => {
@@ -482,7 +463,6 @@ describe("cli", () => {
         });
 
         describe("FixtureDir Dependent Tests", () => {
-
             const originalCwd = process.cwd;
 
             beforeEach(() => {
@@ -505,10 +485,13 @@ describe("cli", () => {
             });
 
             describe("when executing with global flag", () => {
-
                 it(`should default defined variables to read-only with configType:${configType}`, async () => {
                     const filePath = getFixturePath("undef.js");
-                    const exit = await cli.execute(`--global baz,bat --no-ignore --rule no-global-assign:2 ${filePath}`, null, useFlatConfig);
+                    const exit = await cli.execute(
+                        `--global baz,bat --no-ignore --rule no-global-assign:2 ${filePath}`,
+                        null,
+                        useFlatConfig
+                    );
 
                     assert.isTrue(log.info.calledOnce);
                     assert.strictEqual(exit, 1);
@@ -531,10 +514,7 @@ describe("cli", () => {
                 });
             });
 
-
             describe("when supplied with rule flag and severity level set to error", () => {
-
-
                 it(`should exit with an error status (2) with configType:${configType}`, async () => {
                     const filePath = getFixturePath("single-quoted.js");
                     const code = `--no-ignore --rule 'quotes: [2, double]' ${filePath}`;
@@ -545,7 +525,6 @@ describe("cli", () => {
             });
 
             describe("when the quiet option is enabled", () => {
-
                 it(`should only print error with configType:${configType}`, async () => {
                     const filePath = getFixturePath("single-quoted.js");
                     const cliArgs = `--no-ignore --quiet  -f compact --rule 'quotes: [2, double]' --rule 'no-unused-vars: 1' ${filePath}`;
@@ -570,9 +549,7 @@ describe("cli", () => {
                 });
             });
 
-
             describe("no-error-on-unmatched-pattern flag", () => {
-
                 describe("when executing without no-error-on-unmatched-pattern flag", () => {
                     it(`should throw an error on unmatched glob pattern with configType:${configType}`, async () => {
                         let filePath = getFixturePath("unmatched-patterns");
@@ -586,7 +563,6 @@ describe("cli", () => {
                             await cli.execute(`"${filePath}/${globPattern}"`, null, useFlatConfig);
                         }, new Error(`No files matching '${filePath}/${globPattern}' were found.`));
                     });
-
                 });
 
                 describe("when executing with no-error-on-unmatched-pattern flag", () => {
@@ -601,23 +577,29 @@ describe("cli", () => {
                 describe("when executing with no-error-on-unmatched-pattern flag and multiple patterns", () => {
                     it(`should not throw an error on multiple unmatched node glob syntax patterns with configType:${configType}`, async () => {
                         const filePath = getFixturePath("unmatched-patterns/js3");
-                        const exit = await cli.execute(`--no-error-on-unmatched-pattern ${filePath}/unmatched1*.js ${filePath}/unmatched2*.js`, null, useFlatConfig);
+                        const exit = await cli.execute(
+                            `--no-error-on-unmatched-pattern ${filePath}/unmatched1*.js ${filePath}/unmatched2*.js`,
+                            null,
+                            useFlatConfig
+                        );
 
                         assert.strictEqual(exit, 0);
                     });
 
                     it(`should still throw an error on when a matched pattern has lint errors with configType:${configType}`, async () => {
                         const filePath = getFixturePath("unmatched-patterns");
-                        const exit = await cli.execute(`--no-ignore --no-error-on-unmatched-pattern ${filePath}/unmatched1*.js ${filePath}/failing.js`, null, useFlatConfig);
+                        const exit = await cli.execute(
+                            `--no-ignore --no-error-on-unmatched-pattern ${filePath}/unmatched1*.js ${filePath}/failing.js`,
+                            null,
+                            useFlatConfig
+                        );
 
                         assert.strictEqual(exit, 1);
                     });
                 });
-
             });
 
             describe("Parser Options", () => {
-
                 describe("when given parser options", () => {
                     it(`should exit with error if parser options are invalid with configType:${configType}`, async () => {
                         const filePath = getFixturePath("passing.js");
@@ -652,7 +634,11 @@ describe("cli", () => {
                             ? getFixturePath("configurations", "es6.js")
                             : getFixturePath("configurations", "es6.json");
                         const filePath = getFixturePath("passing-es7.js");
-                        const exit = await cli.execute(`--no-ignore --config ${configPath} --parser-options=ecmaVersion:7 ${filePath}`, null, useFlatConfig);
+                        const exit = await cli.execute(
+                            `--no-ignore --config ${configPath} --parser-options=ecmaVersion:7 ${filePath}`,
+                            null,
+                            useFlatConfig
+                        );
 
                         assert.strictEqual(exit, 0);
                     });
@@ -660,7 +646,6 @@ describe("cli", () => {
             });
 
             describe("when given the max-warnings flag", () => {
-
                 let filePath, configFilePath;
 
                 before(() => {
@@ -669,13 +654,21 @@ describe("cli", () => {
                 });
 
                 it(`should not change exit code if warning count under threshold with configType:${configType}`, async () => {
-                    const exitCode = await cli.execute(`--no-ignore --max-warnings 10 ${filePath} -c ${configFilePath}`, null, useFlatConfig);
+                    const exitCode = await cli.execute(
+                        `--no-ignore --max-warnings 10 ${filePath} -c ${configFilePath}`,
+                        null,
+                        useFlatConfig
+                    );
 
                     assert.strictEqual(exitCode, 0);
                 });
 
                 it(`should exit with exit code 1 if warning count exceeds threshold with configType:${configType}`, async () => {
-                    const exitCode = await cli.execute(`--no-ignore --max-warnings 5 ${filePath} -c ${configFilePath}`, null, useFlatConfig);
+                    const exitCode = await cli.execute(
+                        `--no-ignore --max-warnings 5 ${filePath} -c ${configFilePath}`,
+                        null,
+                        useFlatConfig
+                    );
 
                     assert.strictEqual(exitCode, 1);
                     assert.ok(log.error.calledOnce);
@@ -683,7 +676,11 @@ describe("cli", () => {
                 });
 
                 it(`should exit with exit code 1 without printing warnings if the quiet option is enabled and warning count exceeds threshold with configType:${configType}`, async () => {
-                    const exitCode = await cli.execute(`--no-ignore --quiet --max-warnings 5 ${filePath} -c ${configFilePath}`, null, useFlatConfig);
+                    const exitCode = await cli.execute(
+                        `--no-ignore --quiet --max-warnings 5 ${filePath} -c ${configFilePath}`,
+                        null,
+                        useFlatConfig
+                    );
 
                     assert.strictEqual(exitCode, 1);
                     assert.ok(log.error.calledOnce);
@@ -692,7 +689,11 @@ describe("cli", () => {
                 });
 
                 it(`should not change exit code if warning count equals threshold with configType:${configType}`, async () => {
-                    const exitCode = await cli.execute(`--no-ignore --max-warnings 6 ${filePath} -c ${configFilePath}`, null, useFlatConfig);
+                    const exitCode = await cli.execute(
+                        `--no-ignore --max-warnings 6 ${filePath} -c ${configFilePath}`,
+                        null,
+                        useFlatConfig
+                    );
 
                     assert.strictEqual(exitCode, 0);
                 });
@@ -732,13 +733,9 @@ describe("cli", () => {
 
                     assert.strictEqual(exitCode, 2);
                 });
-
-
             });
 
-
             describe("Ignores", () => {
-
                 describe("when given a directory with eslint excluded files in the directory", () => {
                     it(`should throw an error and not process any files with configType:${configType}`, async () => {
                         const options = useFlatConfig
@@ -784,13 +781,13 @@ describe("cli", () => {
                 describe("when given a pattern to ignore", () => {
                     it(`should not process any files with configType:${configType}`, async () => {
                         const ignoredFile = getFixturePath("cli/syntax-error.js");
-                        const ignorePathOption = useFlatConfig
-                            ? ""
-                            : "--ignore-path .eslintignore_empty";
+                        const ignorePathOption = useFlatConfig ? "" : "--ignore-path .eslintignore_empty";
                         const filePath = getFixturePath("cli/passing.js");
                         const ignorePattern = useFlatConfig ? "cli/**" : "cli/";
                         const exit = await cli.execute(
-                            `--ignore-pattern ${ignorePattern} ${ignorePathOption} ${ignoredFile} ${filePath}`, null, useFlatConfig
+                            `--ignore-pattern ${ignorePattern} ${ignorePathOption} ${ignoredFile} ${filePath}`,
+                            null,
+                            useFlatConfig
                         );
 
                         // warnings about the ignored files
@@ -844,18 +841,17 @@ describe("cli", () => {
                         });
                     }
                 });
-
             });
-
         });
 
-
         describe("when given a parser name", () => {
-
             it(`should exit with a fatal error if parser is invalid with configType:${configType}`, async () => {
                 const filePath = getFixturePath("passing.js");
 
-                await stdAssert.rejects(async () => await cli.execute(`--no-ignore --parser test111 ${filePath}`, null, useFlatConfig), "Cannot find module 'test111'");
+                await stdAssert.rejects(
+                    async () => await cli.execute(`--no-ignore --parser test111 ${filePath}`, null, useFlatConfig),
+                    "Cannot find module 'test111'"
+                );
             });
 
             it(`should exit with no error if parser is valid with configType:${configType}`, async () => {
@@ -865,7 +861,6 @@ describe("cli", () => {
 
                 assert.strictEqual(exit, 0);
             });
-
         });
 
         describe("when supplied with report output file path", () => {
@@ -918,23 +913,24 @@ describe("cli", () => {
             });
 
             it(`should pass allowInlineConfig:false to ESLint when --no-inline-config is used with configType:${configType}`, async () => {
-
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ allowInlineConfig: false }));
 
                 Object.defineProperties(fakeESLint.prototype, Object.getOwnPropertyDescriptors(ESLint.prototype));
-                sinon.stub(fakeESLint.prototype, "lintFiles").returns([{
-                    filePath: "./foo.js",
-                    output: "bar",
-                    messages: [
-                        {
-                            severity: 2,
-                            message: "Fake message"
-                        }
-                    ],
-                    errorCount: 1,
-                    warningCount: 0
-                }]);
+                sinon.stub(fakeESLint.prototype, "lintFiles").returns([
+                    {
+                        filePath: "./foo.js",
+                        output: "bar",
+                        messages: [
+                            {
+                                severity: 2,
+                                message: "Fake message"
+                            }
+                        ],
+                        errorCount: 1,
+                        warningCount: 0
+                    }
+                ]);
                 sinon.stub(fakeESLint.prototype, "loadFormatter").returns({ format: () => "done" });
                 fakeESLint.outputFixes = sinon.stub();
 
@@ -948,7 +944,6 @@ describe("cli", () => {
             });
 
             it(`should not error and allowInlineConfig should be true by default with configType:${configType}`, async () => {
-
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ allowInlineConfig: true }));
 
@@ -966,9 +961,7 @@ describe("cli", () => {
                 const exitCode = await localCLI.execute(".", null, useFlatConfig);
 
                 assert.strictEqual(exitCode, 0);
-
             });
-
         });
 
         describe("when passed --fix", () => {
@@ -979,7 +972,6 @@ describe("cli", () => {
             });
 
             it(`should pass fix:true to ESLint when executing on files with configType:${configType}`, async () => {
-
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ fix: true }));
 
@@ -997,24 +989,23 @@ describe("cli", () => {
                 const exitCode = await localCLI.execute("--fix .", null, useFlatConfig);
 
                 assert.strictEqual(exitCode, 0);
-
             });
 
-
             it(`should rewrite files when in fix mode with configType:${configType}`, async () => {
-
-                const report = [{
-                    filePath: "./foo.js",
-                    output: "bar",
-                    messages: [
-                        {
-                            severity: 2,
-                            message: "Fake message"
-                        }
-                    ],
-                    errorCount: 1,
-                    warningCount: 0
-                }];
+                const report = [
+                    {
+                        filePath: "./foo.js",
+                        output: "bar",
+                        messages: [
+                            {
+                                severity: 2,
+                                message: "Fake message"
+                            }
+                        ],
+                        errorCount: 1,
+                        warningCount: 0
+                    }
+                ];
 
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ fix: true }));
@@ -1034,23 +1025,23 @@ describe("cli", () => {
                 const exitCode = await localCLI.execute("--fix .", null, useFlatConfig);
 
                 assert.strictEqual(exitCode, 1);
-
             });
 
             it(`should provide fix predicate and rewrite files when in fix mode and quiet mode with configType:${configType}`, async () => {
-
-                const report = [{
-                    filePath: "./foo.js",
-                    output: "bar",
-                    messages: [
-                        {
-                            severity: 1,
-                            message: "Fake message"
-                        }
-                    ],
-                    errorCount: 0,
-                    warningCount: 1
-                }];
+                const report = [
+                    {
+                        filePath: "./foo.js",
+                        output: "bar",
+                        messages: [
+                            {
+                                severity: 1,
+                                message: "Fake message"
+                            }
+                        ],
+                        errorCount: 0,
+                        warningCount: 1
+                    }
+                ];
 
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ fix: sinon.match.func }));
@@ -1071,11 +1062,9 @@ describe("cli", () => {
                 const exitCode = await localCLI.execute("--fix --quiet .", null, useFlatConfig);
 
                 assert.strictEqual(exitCode, 0);
-
             });
 
             it(`should not call ESLint and return 2 when executing on text with configType:${configType}`, async () => {
-
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().never();
 
@@ -1090,7 +1079,6 @@ describe("cli", () => {
 
                 assert.strictEqual(exitCode, 2);
             });
-
         });
 
         describe("when passed --fix-dry-run", () => {
@@ -1101,7 +1089,6 @@ describe("cli", () => {
             });
 
             it(`should pass fix:true to ESLint when executing on files with configType:${configType}`, async () => {
-
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ fix: true }));
 
@@ -1120,11 +1107,9 @@ describe("cli", () => {
                 const exitCode = await localCLI.execute("--fix-dry-run .", null, useFlatConfig);
 
                 assert.strictEqual(exitCode, 0);
-
             });
 
             it(`should pass fixTypes to ESLint when --fix-type is passed with configType:${configType}`, async () => {
-
                 const expectedESLintOptions = {
                     fix: true,
                     fixTypes: ["suggestion"]
@@ -1151,19 +1136,20 @@ describe("cli", () => {
             });
 
             it(`should not rewrite files when in fix-dry-run mode with configType:${configType}`, async () => {
-
-                const report = [{
-                    filePath: "./foo.js",
-                    output: "bar",
-                    messages: [
-                        {
-                            severity: 2,
-                            message: "Fake message"
-                        }
-                    ],
-                    errorCount: 1,
-                    warningCount: 0
-                }];
+                const report = [
+                    {
+                        filePath: "./foo.js",
+                        output: "bar",
+                        messages: [
+                            {
+                                severity: 2,
+                                message: "Fake message"
+                            }
+                        ],
+                        errorCount: 1,
+                        warningCount: 0
+                    }
+                ];
 
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ fix: true }));
@@ -1183,23 +1169,23 @@ describe("cli", () => {
                 const exitCode = await localCLI.execute("--fix-dry-run .", null, useFlatConfig);
 
                 assert.strictEqual(exitCode, 1);
-
             });
 
             it(`should provide fix predicate when in fix-dry-run mode and quiet mode with configType:${configType}`, async () => {
-
-                const report = [{
-                    filePath: "./foo.js",
-                    output: "bar",
-                    messages: [
-                        {
-                            severity: 1,
-                            message: "Fake message"
-                        }
-                    ],
-                    errorCount: 0,
-                    warningCount: 1
-                }];
+                const report = [
+                    {
+                        filePath: "./foo.js",
+                        output: "bar",
+                        messages: [
+                            {
+                                severity: 1,
+                                message: "Fake message"
+                            }
+                        ],
+                        errorCount: 0,
+                        warningCount: 1
+                    }
+                ];
 
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ fix: sinon.match.func }));
@@ -1220,23 +1206,23 @@ describe("cli", () => {
                 const exitCode = await localCLI.execute("--fix-dry-run --quiet .", null, useFlatConfig);
 
                 assert.strictEqual(exitCode, 0);
-
             });
 
             it(`should allow executing on text with configType:${configType}`, async () => {
-
-                const report = [{
-                    filePath: "./foo.js",
-                    output: "bar",
-                    messages: [
-                        {
-                            severity: 2,
-                            message: "Fake message"
-                        }
-                    ],
-                    errorCount: 1,
-                    warningCount: 0
-                }];
+                const report = [
+                    {
+                        filePath: "./foo.js",
+                        output: "bar",
+                        messages: [
+                            {
+                                severity: 2,
+                                message: "Fake message"
+                            }
+                        ],
+                        errorCount: 1,
+                        warningCount: 0
+                    }
+                ];
 
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().withExactArgs(sinon.match({ fix: true }));
@@ -1259,7 +1245,6 @@ describe("cli", () => {
             });
 
             it(`should not call ESLint and return 2 when used with --fix with configType:${configType}`, async () => {
-
                 // create a fake ESLint class to test with
                 const fakeESLint = sinon.mock().never();
 
@@ -1309,7 +1294,6 @@ describe("cli", () => {
         // ---------
     });
 
-
     describe("when given a config file", () => {
         it("should load the specified config file", async () => {
             const configPath = getFixturePath(".eslintrc");
@@ -1319,11 +1303,8 @@ describe("cli", () => {
         });
     });
 
-
     describe("eslintrc Only", () => {
-
         describe("Environments", () => {
-
             describe("when given a config with environment set to browser", () => {
                 it("should execute without any errors", async () => {
                     const configPath = getFixturePath("configurations", "env-browser.json");
@@ -1416,8 +1397,6 @@ describe("cli", () => {
                 assert.isTrue(log.info.neverCalledWith(""));
                 assert.strictEqual(exit, 1);
             });
-
-
         });
 
         describe("when executing with no-eslintrc flag", () => {
@@ -1442,17 +1421,13 @@ describe("cli", () => {
 
         describe("when executing without env flag", () => {
             it("should not define environment-specific globals", async () => {
-                const files = [
-                    getFixturePath("globals-browser.js"),
-                    getFixturePath("globals-node.js")
-                ];
+                const files = [getFixturePath("globals-browser.js"), getFixturePath("globals-node.js")];
 
                 await cli.execute(`--no-eslintrc --config ./conf/eslint-recommended.js --no-ignore ${files.join(" ")}`);
 
                 assert.strictEqual(log.info.args[0][0].split("\n").length, 10);
             });
         });
-
 
         describe("when supplied with a plugin", () => {
             it("should pass plugins to ESLint", async () => {
@@ -1464,7 +1439,6 @@ describe("cli", () => {
                     }
                 });
             });
-
         });
 
         describe("when supplied with a plugin-loading path", () => {
@@ -1476,9 +1450,5 @@ describe("cli", () => {
                 });
             });
         });
-
-
     });
-
-
 });

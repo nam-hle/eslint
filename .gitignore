@@ -15,6 +15,7 @@ jsdoc/
 *.iml
 .eslintcache
 .cache
+/lib
 /packages/**/node_modules
 /tools/internal-rules/node_modules
 /.vscode

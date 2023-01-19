@@ -368,12 +368,12 @@ ruleTester.run("lines-around-comment", rule, {
         {
             code: `
             switch (foo) {
-            // this comment is allowed by allowBlockStart: true 
-                
-            case 1:    
+            // this comment is allowed by allowBlockStart: true
+
+            case 1:
                 bar();
                 break;
-                
+
             // this comment is allowed by allowBlockEnd: true
             }
             `,
@@ -388,9 +388,9 @@ ruleTester.run("lines-around-comment", rule, {
             code: `
             switch (foo)
             {
-            // this comment is allowed by allowBlockStart: true 
-                
-            case 1:    
+            // this comment is allowed by allowBlockStart: true
+
+            case 1:
                 bar();
                 break;
             }
@@ -2168,8 +2168,8 @@ ruleTester.run("lines-around-comment", rule, {
 
                 foo
             )
-            {   
-            case 1:    
+            {
+            case 1:
                 bar();
                 break;
             }
@@ -2181,8 +2181,8 @@ ruleTester.run("lines-around-comment", rule, {
 
                 foo
             )
-            {   
-            case 1:    
+            {
+            case 1:
                 bar();
                 break;
             }

@@ -62,7 +62,6 @@ function readStdin() {
  * @returns {string} The error message.
  */
 function getErrorMessage(error) {
-
     // Lazy loading because this is used only if an error happened.
     const util = require("util");
 
@@ -78,7 +77,6 @@ function getErrorMessage(error) {
 
             return template(error.messageData || {});
         } catch {
-
             // Ignore template error then fallback to use `error.stack`.
         }
     }
@@ -121,7 +119,6 @@ ${message}`);
 
     // Call the config initializer if `--init` is present.
     if (process.argv.includes("--init")) {
-
         // `eslint --init` has been moved to `@eslint/create-config`
         console.warn("You can also run this command directly using 'npm init @eslint/config'.");
 
@@ -132,9 +129,5 @@ ${message}`);
     }
 
     // Otherwise, call the CLI.
-    process.exitCode = await require("../lib/cli").execute(
-        process.argv,
-        process.argv.includes("--stdin") ? await readStdin() : null,
-        true
-    );
-}()).catch(onFatalError);
+    process.exitCode = await require("../lib/cli").execute(process.argv, process.argv.includes("--stdin") ? await readStdin() : null, true);
+})().catch(onFatalError);
