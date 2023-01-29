@@ -1,7 +1,7 @@
 {
     "name": "@eslint/types",
     "version": "1.4.1-beta.2",
-    "description": "The legacy ESLintRC config file format for ESLint",
+    "description": "Types for ESLint",
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
     "files": [
