@@ -17,6 +17,7 @@ jsdoc/
 .cache
 /lib
 /packages/**/node_modules
+!/packages/**/fixtures/**/node_modules
 /tools/internal-rules/node_modules
 /.vscode
 .sublimelinterrc

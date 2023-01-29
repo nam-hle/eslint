@@ -113,8 +113,6 @@
     "@types/marked": "^4.0.8",
     "@types/minimatch": "^5.1.2",
     "@types/text-table": "^0.2.2",
-    "@typescript-eslint/eslint-plugin": "^5.18.0",
-    "@typescript-eslint/parser": "^5.10.1",
     "@eslint/types": "../types",
     "babel-loader": "^8.0.5",
     "c8": "^7.12.0",
