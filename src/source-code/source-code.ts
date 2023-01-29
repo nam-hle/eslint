@@ -8,10 +8,9 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-// @ts-expect-error
 import { isCommentToken } from "eslint-utils";
 
-import { ASTNode } from "../estree";
+import { ASTNode, Position, RootAST } from "../estree";
 import * as astUtils from "../shared/ast-utils";
 import Traverser from "../shared/traverser";
 import { ScopeManager, Token } from "../shared/types";
@@ -29,13 +28,11 @@ import TokenStore from "./token-store";
  * @returns {void}
  * @private
  */
-function validate(ast: ASTNode) {
-    // @ts-expect-error
+function validate(ast: RootAST) {
     if (!ast.tokens) {
         throw new Error("AST is missing the tokens array.");
     }
 
-    // @ts-expect-error
     if (!ast.comments) {
         throw new Error("AST is missing the comments array.");
     }
@@ -122,9 +119,7 @@ function isSpaceBetween(sourceCode: SourceCode, first: ASTNode | Token, second: 
     }
 
     const [startingNodeOrToken, endingNodeOrToken] = first.range[1] <= second.range[0] ? [first, second] : [second, first];
-    // @ts-expect-error
     const firstToken = sourceCode.getLastToken(startingNodeOrToken) || startingNodeOrToken;
-    // @ts-expect-error
     const finalToken = sourceCode.getFirstToken(endingNodeOrToken) || endingNodeOrToken;
     let currentToken = firstToken;
 
@@ -132,8 +127,7 @@ function isSpaceBetween(sourceCode: SourceCode, first: ASTNode | Token, second: 
         const nextToken = sourceCode.getTokenAfter(currentToken, { includeComments: true });
 
         if (
-            // @ts-expect-error
-            currentToken.range[1] !== nextToken.range[0] ||
+            currentToken.range[1] !== nextToken?.range[0] ||
             /*
              * For backward compatibility, check spaces in JSXText.
              * https://github.com/eslint/eslint/issues/12614
@@ -142,12 +136,10 @@ function isSpaceBetween(sourceCode: SourceCode, first: ASTNode | Token, second: 
                 nextToken !== finalToken &&
                 // @ts-expect-error
                 nextToken.type === "JSXText" &&
-                // @ts-expect-error
                 /\s/u.test(nextToken.value))
         ) {
             return true;
         }
-        // @ts-expect-error
         currentToken = nextToken;
     }
 
@@ -160,8 +152,8 @@ function isSpaceBetween(sourceCode: SourceCode, first: ASTNode | Token, second: 
 
 interface SourceCodeOptions {
     text: string;
-    ast: ASTNode;
-    parserServices: object | null;
+    ast: RootAST;
+    parserServices: Record<string, any> | null;
     scopeManager: ScopeManager | null;
     visitorKeys: object | null;
 }
@@ -171,9 +163,9 @@ interface SourceCodeOptions {
  */
 class SourceCode extends TokenStore {
     hasBOM: boolean;
-    ast: ASTNode;
+    ast: RootAST;
     text: string;
-    parserServices: object | null;
+    parserServices: Record<string, any>;
     scopeManager: ScopeManager | null;
     visitorKeys: object | null;
     lines: string[];
@@ -189,8 +181,12 @@ class SourceCode extends TokenStore {
      * @param {Object|null} textOrConfig.visitorKeys The visitor keys to traverse AST.
      * @param {ASTNode} [astIfNoConfig] The Program node of the AST representing the code. This AST should be created from the text that BOM was stripped.
      */
-    constructor(textOrConfig: string | SourceCodeOptions, astIfNoConfig: ASTNode) {
-        let text, ast: ASTNode, parserServices: object | null, scopeManager: ScopeManager | null, visitorKeys: object | null;
+    constructor(textOrConfig: string | SourceCodeOptions, astIfNoConfig: RootAST) {
+        let text,
+            ast: RootAST,
+            parserServices: Record<string, any> | null = null,
+            scopeManager: ScopeManager | null = null,
+            visitorKeys: object | null = null;
 
         // Process overloading.
         if (typeof textOrConfig === "string") {
@@ -208,7 +204,6 @@ class SourceCode extends TokenStore {
 
         validate(ast);
 
-        // @ts-expect-error
         super(ast.tokens, ast.comments);
 
         /**
@@ -234,35 +229,28 @@ class SourceCode extends TokenStore {
          * The parser services of this source code.
          * @type {Object}
          */
-        // @ts-expect-error
         this.parserServices = parserServices || {};
 
         /**
          * The scope of this source code.
          * @type {ScopeManager|null}
          */
-        // @ts-expect-error
         this.scopeManager = scopeManager || null;
 
         /**
          * The visitor keys to traverse AST.
          * @type {Object}
          */
-        // @ts-expect-error
         this.visitorKeys = visitorKeys || Traverser.DEFAULT_VISITOR_KEYS;
 
         // Check the source text for the presence of a shebang since it is parsed as a standard line comment.
         const shebangMatched = this.text.match(astUtils.shebangPattern);
-        const hasShebang =
-            // @ts-expect-error
-            shebangMatched && ast.comments.length && ast.comments[0].value === shebangMatched[1];
+        const hasShebang = shebangMatched && ast.comments.length && ast.comments[0].value === shebangMatched[1];
 
         if (hasShebang) {
-            // @ts-expect-error
             ast.comments[0].type = "Shebang";
         }
 
-        // @ts-expect-error
         this.tokensAndComments = sortedMerge(ast.tokens, ast.comments);
 
         /**
@@ -339,7 +327,6 @@ class SourceCode extends TokenStore {
      * @public
      */
     getAllComments() {
-        // @ts-expect-error
         return this.ast.comments;
     }
 
@@ -406,6 +393,7 @@ class SourceCode extends TokenStore {
                 }
                 // @ts-expect-error
                 comments.leading.push(currentToken);
+                // @ts-expect-error
                 currentToken = this.getTokenBefore(currentToken, { includeComments: true });
             }
 
@@ -544,8 +532,7 @@ class SourceCode extends TokenStore {
      * any of the tokens found between the two given nodes or tokens.
      * @public
      */
-    // @ts-expect-error
-    isSpaceBetween(first, second) {
+    isSpaceBetween(first: ASTNode | Token, second: ASTNode | Token) {
         return isSpaceBetween(this, first, second, false);
     }
 
@@ -562,8 +549,7 @@ class SourceCode extends TokenStore {
      * @deprecated in favor of isSpaceBetween().
      * @public
      */
-    // @ts-expect-error
-    isSpaceBetweenTokens(first, second) {
+    isSpaceBetweenTokens(first: ASTNode | Token, second: ASTNode | Token) {
         return isSpaceBetween(this, first, second, true);
     }
 
@@ -574,8 +560,7 @@ class SourceCode extends TokenStore {
      * @returns {Object} A {line, column} location object with a 0-indexed column
      * @public
      */
-    // @ts-expect-error
-    getLocFromIndex(index) {
+    getLocFromIndex(index: number) {
         if (typeof index !== "number") {
             throw new TypeError("Expected `index` to be a number.");
         }
@@ -618,8 +603,7 @@ class SourceCode extends TokenStore {
      * @returns {number} The range index of the location in the file.
      * @public
      */
-    // @ts-expect-error
-    getIndexFromLoc(loc) {
+    getIndexFromLoc(loc: Position) {
         if (typeof loc !== "object" || typeof loc.line !== "number" || typeof loc.column !== "number") {
             throw new TypeError("Expected `loc` to be an object with numeric `line` and `column` properties.");
         }

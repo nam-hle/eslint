@@ -27,7 +27,7 @@ export = class ForwardTokenCursor extends Cursor {
     /**
      * Initializes this cursor.
      * @param {Token[]} tokens The array of tokens.
-     * @param {Comment[]} comments The array of comments.
+     * @param {Comment[]} _comments The array of comments.
      * @param {Object} indexMap The map from locations to indices in `tokens`.
      * @param {number} startLoc The start location of the iteration range.
      * @param {number} endLoc The end location of the iteration range.
@@ -61,7 +61,7 @@ export = class ForwardTokenCursor extends Cursor {
     }
 
     /** @inheritdoc */
-    getAllTokens() {
+    getAllTokens(): (Token | Comment)[] {
         return this.tokens.slice(this.index, this.indexEnd + 1);
     }
 };

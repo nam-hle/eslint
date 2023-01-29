@@ -29,14 +29,14 @@ import { FilterPredicate } from "./utils";
  * @private
  */
 export class CursorFactory {
-    TokenCursor: Cursor;
-    TokenCommentCursor: Cursor;
+    TokenCursor: typeof ForwardTokenCursor;
+    TokenCommentCursor: typeof ForwardTokenCommentCursor;
     /**
      * Initializes this cursor.
      * @param {Function} TokenCursor The class of the cursor which iterates tokens only.
      * @param {Function} TokenCommentCursor The class of the cursor which iterates the mix of tokens and comments.
      */
-    constructor(TokenCursor: Cursor, TokenCommentCursor: Cursor) {
+    constructor(TokenCursor: typeof ForwardTokenCursor, TokenCommentCursor: typeof ForwardTokenCommentCursor) {
         this.TokenCursor = TokenCursor;
         this.TokenCommentCursor = TokenCommentCursor;
     }
@@ -54,7 +54,6 @@ export class CursorFactory {
     createBaseCursor(tokens: Token[], comments: Comment[], indexMap: any, startLoc: number, endLoc: any, includeComments: boolean): Cursor {
         const Cursor = includeComments ? this.TokenCommentCursor : this.TokenCursor;
 
-        // @ts-expect-error
         return new Cursor(tokens, comments, indexMap, startLoc, endLoc);
     }
 
@@ -102,7 +101,5 @@ export class CursorFactory {
 // Exports
 //------------------------------------------------------------------------------
 
-// @ts-expect-error
 export const forward = new CursorFactory(ForwardTokenCursor, ForwardTokenCommentCursor);
-// @ts-expect-error
 export const backward = new CursorFactory(BackwardTokenCursor, BackwardTokenCommentCursor);

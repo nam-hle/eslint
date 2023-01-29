@@ -48,7 +48,7 @@ class Cursor {
      * This consumes this cursor.
      * @returns {Token|Comment} The first token or null.
      */
-    getOneToken() {
+    getOneToken(): Token | Comment | null {
         return this.moveNext() ? this.current : null;
     }
 

@@ -106,7 +106,7 @@ function createCursorWithSkip(
     let filter: FilterPredicate | null = null;
 
     if (typeof opts === "number") {
-        skip = opts | 0;
+        skip = opts || 0;
     } else if (typeof opts === "function") {
         filter = opts;
     } else if (opts) {
@@ -208,8 +208,8 @@ function createCursorWithPadding(
     indexMap: IndexMap,
     startLoc: number,
     endLoc: number,
-    beforeCount?: number,
-    afterCount?: number
+    beforeCount = 0,
+    afterCount = 0
 ) {
     if (typeof beforeCount === "undefined" && typeof afterCount === "undefined") {
         return new ForwardTokenCursor(tokens, comments, indexMap, startLoc, endLoc);
@@ -300,7 +300,7 @@ export = class TokenStore {
      * @param {number} [options.skip=0] The count of tokens the cursor skips.
      * @returns {Token|null} An object representing the token.
      */
-    getFirstToken(node: ASTNode, options: SkipCursorOption) {
+    getFirstToken(node: ASTNode | Token, options: SkipCursorOption = 0) {
         return createCursorWithSkip(
             cursors.forward,
             this[TOKENS],
@@ -318,7 +318,7 @@ export = class TokenStore {
      * @param {number|Function|Object} [options=0] The option object. Same options as getFirstToken()
      * @returns {Token|null} An object representing the token.
      */
-    getLastToken(node: ASTNode, options: SkipCursorOption) {
+    getLastToken(node: ASTNode | Token, options: SkipCursorOption = 0) {
         return createCursorWithSkip(
             cursors.backward,
             this[TOKENS],
@@ -336,7 +336,7 @@ export = class TokenStore {
      * @param {number|Function|Object} [options=0] The option object. Same options as getFirstToken()
      * @returns {Token|null} An object representing the token.
      */
-    getTokenBefore(node: ASTNode | Token | Comment, options: SkipCursorOption = 0) {
+    getTokenBefore(node: ASTNode | Token, options: SkipCursorOption = 0) {
         return createCursorWithSkip(
             cursors.backward,
             this[TOKENS],
@@ -413,7 +413,7 @@ export = class TokenStore {
      * @returns {Token|null} An object representing the token.
      * @deprecated
      */
-    getTokenOrCommentBefore(node: ASTNode | Token | Comment, skip = 0) {
+    getTokenOrCommentBefore(node: ASTNode | Token, skip = 0) {
         return this.getTokenBefore(node, { includeComments: true, skip });
     }
 

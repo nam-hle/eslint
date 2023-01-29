@@ -3,6 +3,8 @@
 // Definitions by: RReverser <https://github.com/RReverser>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
+import { Token } from "./shared/types";
+
 // This definition file follows a somewhat unusual format. ESTree allows
 // runtime type checks based on the `type` parameter. In order to explain this
 // to typescript we want to use discriminated union types:
@@ -64,7 +66,7 @@ export interface NodeMap {
 export type Node = NodeMap[keyof NodeMap];
 
 export interface Comment extends BaseNodeWithoutComments {
-    type: "Line" | "Block";
+    type: "Line" | "Block" | "Shebang";
     value: string;
 }
 
@@ -692,3 +694,8 @@ export type ASTNode =
     | SwitchCase
     | TemplateElement
     | VariableDeclarator;
+
+export type RootAST = ASTNode & {
+    comments: Comment[];
+    tokens: Token[];
+};

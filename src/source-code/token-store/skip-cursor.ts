@@ -31,7 +31,7 @@ export = class SkipCursor extends DecorativeCursor {
     }
 
     /** @inheritdoc */
-    moveNext() {
+    moveNext(): boolean {
         while (this.count > 0) {
             this.count -= 1;
             if (!super.moveNext()) {
