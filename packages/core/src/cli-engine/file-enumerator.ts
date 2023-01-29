@@ -38,11 +38,11 @@ import fs from "fs";
 import path from "path";
 
 import { Legacy } from "@eslint/eslintrc";
+import type { ConfigArray } from "@eslint/eslintrc";
 import Debug from "debug";
 import { IOptions } from "minimatch";
 
 import { assert } from "../shared/assert";
-import { ConfigArray } from "../shared/types";
 
 const escapeRegExp = require("escape-string-regexp");
 const getGlobParent = require("glob-parent");

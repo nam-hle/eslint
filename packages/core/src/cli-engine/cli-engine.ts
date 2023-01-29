@@ -18,17 +18,10 @@
 import fs from "fs";
 import path from "path";
 
-import { Legacy, Rule } from "@eslint/eslintrc";
-import Debug from "debug";
-const debug = Debug("eslint:cli-engine");
-
-import defaultOptions from "../conf/default-cli-options";
-import { Linter } from "../linter";
-import builtInRules from "../rules";
-import { assert } from "../shared/assert";
-import { packageJson } from "../shared/package";
+import { Legacy } from "@eslint/eslintrc";
+import type { ConfigArray } from "@eslint/eslintrc";
 import {
-    ConfigArray,
+    Rule,
     ConfigData,
     DeprecatedRuleInfo,
     FormatterFunction,
@@ -37,7 +30,15 @@ import {
     Plugin,
     RuleConf,
     SuppressedLintMessage
-} from "../shared/types";
+} from "@eslint/types";
+import Debug from "debug";
+const debug = Debug("eslint:cli-engine");
+
+import defaultOptions from "../conf/default-cli-options";
+import { Linter } from "../linter";
+import builtInRules from "../rules";
+import { assert } from "../shared/assert";
+import { packageJson } from "../shared/package";
 
 import { FileEnumerator } from "./file-enumerator";
 import hash from "./hash";

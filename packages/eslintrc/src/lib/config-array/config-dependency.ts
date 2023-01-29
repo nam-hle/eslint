@@ -15,7 +15,7 @@
  * @author Toru Nagashima <https://github.com/mysticatea>
  */
 
-import util from 'util';
+import util from "util";
 
 interface DependencyData<T> {
     definition?: T;

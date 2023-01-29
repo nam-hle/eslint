@@ -13,6 +13,7 @@ import fs from "fs";
 import path from "path";
 import util from "util";
 
+import { LintMessage } from "@eslint/types";
 import * as fswalk from "@nodelib/fs.walk";
 import globParent from "glob-parent";
 import isGlob from "is-glob";
@@ -20,7 +21,6 @@ import isPathInside from "is-path-inside";
 import minimatch from "minimatch";
 
 import hash from "../cli-engine/hash";
-import { LintMessage } from "../shared/types";
 
 import { FlatESLintOptions } from "./flat-eslint";
 

@@ -20,6 +20,7 @@ import path from "path";
 import { promisify } from "util";
 
 import { Legacy } from "@eslint/eslintrc";
+import { ParsedCLIOptions, LintMessage, LintResult, ResultsMeta, EnvsMap, GlobalsMap, Plugin } from "@eslint/types";
 import { ModuleImporter } from "@humanwhocodes/module-importer";
 import Debug from "debug";
 
@@ -29,8 +30,6 @@ import { FlatESLint, findFlatConfigFile } from "./eslint/flat-eslint";
 import createCLIOptions from "./options";
 import log from "./shared/logging";
 import * as RuntimeInfo from "./shared/runtime-info";
-import { LintMessage, LintResult, ResultsMeta, EnvsMap, GlobalsMap, Plugin } from "./shared/types";
-import { ParsedCLIOptions } from "./types";
 
 const debug = Debug("eslint:cli");
 const { naming } = Legacy;

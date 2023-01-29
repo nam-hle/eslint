@@ -7,8 +7,8 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import Ajv from 'ajv';
-import type { JSONSchema4 } from 'json-schema';
+import Ajv from "ajv";
+import type { JSONSchema4 } from "json-schema";
 
 //-----------------------------------------------------------------------------
 // Helpers
@@ -20,139 +20,139 @@ import type { JSONSchema4 } from 'json-schema';
  * Copyright (c) 2015-2017 Evgeny Poberezkin
  */
 const metaSchema: JSONSchema4 = {
-    id: 'http://json-schema.org/draft-04/schema#',
-    $schema: 'http://json-schema.org/draft-04/schema#',
-    description: 'Core schema meta-schema',
+    id: "http://json-schema.org/draft-04/schema#",
+    $schema: "http://json-schema.org/draft-04/schema#",
+    description: "Core schema meta-schema",
     definitions: {
         schemaArray: {
-            type: 'array',
+            type: "array",
             minItems: 1,
-            items: { $ref: '#' }
+            items: { $ref: "#" }
         },
         positiveInteger: {
-            type: 'integer',
+            type: "integer",
             minimum: 0
         },
         positiveIntegerDefault0: {
-            allOf: [{ $ref: '#/definitions/positiveInteger' }, { default: 0 }]
+            allOf: [{ $ref: "#/definitions/positiveInteger" }, { default: 0 }]
         },
         simpleTypes: {
-            enum: ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string']
+            enum: ["array", "boolean", "integer", "null", "number", "object", "string"]
         },
         stringArray: {
-            type: 'array',
-            items: { type: 'string' },
+            type: "array",
+            items: { type: "string" },
             minItems: 1,
             uniqueItems: true
         }
     },
-    type: 'object',
+    type: "object",
     properties: {
         id: {
-            type: 'string'
+            type: "string"
         },
         $schema: {
-            type: 'string'
+            type: "string"
         },
         title: {
-            type: 'string'
+            type: "string"
         },
         description: {
-            type: 'string'
+            type: "string"
         },
         default: {},
         multipleOf: {
-            type: 'number',
+            type: "number",
             minimum: 0,
             exclusiveMinimum: true
         },
         maximum: {
-            type: 'number'
+            type: "number"
         },
         exclusiveMaximum: {
-            type: 'boolean',
+            type: "boolean",
             default: false
         },
         minimum: {
-            type: 'number'
+            type: "number"
         },
         exclusiveMinimum: {
-            type: 'boolean',
+            type: "boolean",
             default: false
         },
-        maxLength: { $ref: '#/definitions/positiveInteger' },
-        minLength: { $ref: '#/definitions/positiveIntegerDefault0' },
+        maxLength: { $ref: "#/definitions/positiveInteger" },
+        minLength: { $ref: "#/definitions/positiveIntegerDefault0" },
         pattern: {
-            type: 'string',
-            format: 'regex'
+            type: "string",
+            format: "regex"
         },
         additionalItems: {
-            anyOf: [{ type: 'boolean' }, { $ref: '#' }],
+            anyOf: [{ type: "boolean" }, { $ref: "#" }],
             default: {}
         },
         items: {
-            anyOf: [{ $ref: '#' }, { $ref: '#/definitions/schemaArray' }],
+            anyOf: [{ $ref: "#" }, { $ref: "#/definitions/schemaArray" }],
             default: {}
         },
-        maxItems: { $ref: '#/definitions/positiveInteger' },
-        minItems: { $ref: '#/definitions/positiveIntegerDefault0' },
+        maxItems: { $ref: "#/definitions/positiveInteger" },
+        minItems: { $ref: "#/definitions/positiveIntegerDefault0" },
         uniqueItems: {
-            type: 'boolean',
+            type: "boolean",
             default: false
         },
-        maxProperties: { $ref: '#/definitions/positiveInteger' },
-        minProperties: { $ref: '#/definitions/positiveIntegerDefault0' },
-        required: { $ref: '#/definitions/stringArray' },
+        maxProperties: { $ref: "#/definitions/positiveInteger" },
+        minProperties: { $ref: "#/definitions/positiveIntegerDefault0" },
+        required: { $ref: "#/definitions/stringArray" },
         additionalProperties: {
-            anyOf: [{ type: 'boolean' }, { $ref: '#' }],
+            anyOf: [{ type: "boolean" }, { $ref: "#" }],
             default: {}
         },
         definitions: {
-            type: 'object',
-            additionalProperties: { $ref: '#' },
+            type: "object",
+            additionalProperties: { $ref: "#" },
             default: {}
         },
         properties: {
-            type: 'object',
-            additionalProperties: { $ref: '#' },
+            type: "object",
+            additionalProperties: { $ref: "#" },
             default: {}
         },
         patternProperties: {
-            type: 'object',
-            additionalProperties: { $ref: '#' },
+            type: "object",
+            additionalProperties: { $ref: "#" },
             default: {}
         },
         dependencies: {
-            type: 'object',
+            type: "object",
             additionalProperties: {
-                anyOf: [{ $ref: '#' }, { $ref: '#/definitions/stringArray' }]
+                anyOf: [{ $ref: "#" }, { $ref: "#/definitions/stringArray" }]
             }
         },
         enum: {
-            type: 'array',
+            type: "array",
             minItems: 1,
             uniqueItems: true
         },
         type: {
             anyOf: [
-                { $ref: '#/definitions/simpleTypes' },
+                { $ref: "#/definitions/simpleTypes" },
                 {
-                    type: 'array',
-                    items: { $ref: '#/definitions/simpleTypes' },
+                    type: "array",
+                    items: { $ref: "#/definitions/simpleTypes" },
                     minItems: 1,
                     uniqueItems: true
                 }
             ]
         },
-        format: { type: 'string' },
-        allOf: { $ref: '#/definitions/schemaArray' },
-        anyOf: { $ref: '#/definitions/schemaArray' },
-        oneOf: { $ref: '#/definitions/schemaArray' },
-        not: { $ref: '#' }
+        format: { type: "string" },
+        allOf: { $ref: "#/definitions/schemaArray" },
+        anyOf: { $ref: "#/definitions/schemaArray" },
+        oneOf: { $ref: "#/definitions/schemaArray" },
+        not: { $ref: "#" }
     },
     dependencies: {
-        exclusiveMaximum: ['maximum'],
-        exclusiveMinimum: ['minimum']
+        exclusiveMaximum: ["maximum"],
+        exclusiveMinimum: ["minimum"]
     },
     default: {}
 };
@@ -166,9 +166,9 @@ export default (additionalOptions = {}) => {
         meta: false,
         useDefaults: true,
         validateSchema: false,
-        missingRefs: 'ignore',
+        missingRefs: "ignore",
         verbose: true,
-        schemaId: 'auto',
+        schemaId: "auto",
         ...additionalOptions
     });
 

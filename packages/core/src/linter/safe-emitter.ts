@@ -5,7 +5,7 @@
 
 "use strict";
 
-import { Listener, SafeEmitter } from "../shared/types";
+import { Listener, SafeEmitter } from "@eslint/types";
 
 //------------------------------------------------------------------------------
 // Typedefs

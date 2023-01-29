@@ -4,12 +4,6 @@
     "description": "The legacy ESLintRC config file format for ESLint",
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
-    "exports": {
-        ".": {
-            "import": "./lib/index.js"
-        },
-        "./package.json": "./package.json"
-    },
     "files": [
         "src",
         "lib"

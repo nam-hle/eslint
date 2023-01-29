@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
-import { Comment, Token } from "../../shared/types";
+import { Comment, Token } from "@eslint/types";
 
 import Cursor from "./cursor";
 import DecorativeCursor from "./decorative-cursor";

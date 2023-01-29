@@ -5,7 +5,7 @@
 
 "use strict";
 
-import { ParsedCLIOptions } from "./types";
+import { ParsedCLIOptions } from "@eslint/types";
 
 //------------------------------------------------------------------------------
 // Requirements

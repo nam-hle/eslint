@@ -4,9 +4,8 @@
  */
 "use strict";
 
+import { FormatterMessage, FormatterResults } from "@eslint/types";
 import yaml from "js-yaml";
-
-import { FormatterMessage, FormatterResults } from "../../shared/types";
 
 //------------------------------------------------------------------------------
 // Helper Functions

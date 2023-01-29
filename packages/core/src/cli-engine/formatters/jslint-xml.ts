@@ -4,7 +4,7 @@
  */
 "use strict";
 
-import { FormatterResults } from "../../shared/types";
+import { FormatterResults } from "@eslint/types";
 
 const xmlEscape = require("../xml-escape");
 

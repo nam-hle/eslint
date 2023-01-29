@@ -12,18 +12,24 @@
 
 import path from "path";
 
+import { Legacy } from "@eslint/eslintrc";
+import type { ExtractedConfig, ConfigArray } from "@eslint/eslintrc";
 import {
     ConfigData,
     Environment,
-    ExtractedConfig,
     GlobalsMap,
-    Legacy,
     ParseResult,
     ParserOptions,
     Rule,
     ScopeManager,
-    SeverityString
-} from "@eslint/eslintrc";
+    SeverityString,
+    SuppressedLintMessage,
+    Parser,
+    Processor,
+    LintMessage,
+    LanguageOptions,
+    Token
+} from "@eslint/types";
 import Debug from "debug";
 import { analyze, Scope, Variable } from "eslint-scope";
 import { KEYS } from "eslint-visitor-keys";
@@ -42,7 +48,6 @@ import { shebangPattern } from "../shared/ast-utils";
 import { directivesPattern } from "../shared/directives";
 import { packageJson } from "../shared/package";
 import Traverser from "../shared/traverser";
-import { SuppressedLintMessage, Parser, Processor, ConfigArray, LintMessage, LanguageOptions, Token } from "../shared/types";
 import { SourceCode } from "../source-code";
 
 import applyDisableDirectives from "./apply-disable-directives";

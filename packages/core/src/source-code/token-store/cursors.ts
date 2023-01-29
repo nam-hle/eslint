@@ -8,7 +8,7 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import { Comment, Token } from "../../shared/types";
+import { Comment, Token } from "@eslint/types";
 
 import BackwardTokenCommentCursor from "./backward-token-comment-cursor";
 import BackwardTokenCursor from "./backward-token-cursor";

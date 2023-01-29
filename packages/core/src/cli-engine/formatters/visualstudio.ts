@@ -5,7 +5,7 @@
 
 "use strict";
 
-import { FormatterMessage, FormatterResults } from "../../shared/types";
+import { FormatterMessage, FormatterResults } from "@eslint/types";
 //------------------------------------------------------------------------------
 // Helper Functions
 //------------------------------------------------------------------------------

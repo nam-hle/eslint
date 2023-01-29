@@ -4,10 +4,9 @@
  */
 "use strict";
 
-import { ASTNode } from "../estree";
-import { Fix, Token } from "../shared/types";
+import { Fix, Token, RuleFixer } from "@eslint/types";
 
-import { RuleFixer } from "./types";
+import { ASTNode } from "../estree";
 
 //------------------------------------------------------------------------------
 // Requirements

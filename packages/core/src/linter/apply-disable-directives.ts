@@ -5,7 +5,7 @@
 
 "use strict";
 
-import { Token } from "../shared/types";
+import { Token } from "@eslint/types";
 
 const escapeRegExp = require("escape-string-regexp");
 

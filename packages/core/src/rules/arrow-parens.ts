@@ -8,9 +8,9 @@
 // Requirements
 //------------------------------------------------------------------------------
 
+import { Rule, Token, RuleFixer } from "@eslint/types";
+
 import { ArrowFunctionExpression } from "../estree";
-import { RuleFixer } from "../linter/types";
-import { Rule, Token } from "../shared/types";
 
 import astUtils from "./utils/ast-utils";
 

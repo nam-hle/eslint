@@ -15,12 +15,12 @@ import path from "path";
 import { promisify } from "util";
 
 import { Legacy } from "@eslint/eslintrc";
+import { ResultsMeta, Rule, RuleMeta, ConfigData, Plugin } from "@eslint/types";
 
 import { CLIEngine, CLIEngineOptions, getCLIEngineInternalSlots, LintReport, LintResult } from "../cli-engine/cli-engine";
 import BuiltinRules from "../rules";
 import { assert } from "../shared/assert";
 import { packageJson } from "../shared/package";
-import { ResultsMeta, Rule, RuleMeta, ConfigData, Plugin } from "../shared/types";
 
 const {
     ConfigOps: { getRuleSeverity }

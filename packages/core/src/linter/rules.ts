@@ -6,7 +6,7 @@
 
 "use strict";
 
-import { Rule } from "../shared/types";
+import { Rule } from "@eslint/types";
 
 //------------------------------------------------------------------------------
 // Requirements

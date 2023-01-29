@@ -4,9 +4,8 @@
  */
 "use strict";
 
+import { Rule } from "@eslint/types";
 import Debug from "debug";
-
-import { Rule } from "../../shared/types";
 
 const debug = Debug("eslint:rules");
 

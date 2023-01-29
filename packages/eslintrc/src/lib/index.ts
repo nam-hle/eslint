@@ -48,3 +48,4 @@ const Legacy = {
 };
 
 export { Legacy, FlatCompat };
+export type { ConfigArray, ExtractedConfig };

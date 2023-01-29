@@ -17,11 +17,11 @@
  * @author Toru Nagashima <https://github.com/mysticatea>
  */
 
-import assert from 'assert';
-import path from 'path';
-import util from 'util';
+import assert from "assert";
+import path from "path";
+import util from "util";
 
-import minimatch from 'minimatch';
+import minimatch from "minimatch";
 
 const { Minimatch } = minimatch;
 
@@ -50,7 +50,7 @@ function normalizePatterns(patterns: string | string[] | undefined): string[] {
     if (Array.isArray(patterns)) {
         return patterns.filter(Boolean);
     }
-    if (typeof patterns === 'string' && patterns) {
+    if (typeof patterns === "string" && patterns) {
         return [patterns];
     }
     return [];
@@ -65,7 +65,7 @@ function toMatcher(patterns: string[]): InstanceType<typeof Minimatch>[] | null 
     if (patterns.length === 0) {
         return null;
     }
-    return patterns.map((pattern) => {
+    return patterns.map(pattern => {
         if (/^\.[/\\]/u.test(pattern)) {
             return new Minimatch(
                 pattern.slice(2),
@@ -85,8 +85,8 @@ function toMatcher(patterns: string[]): InstanceType<typeof Minimatch>[] | null 
  */
 function patternToJson({ includes, excludes }: Pattern) {
     return {
-        includes: includes && includes.map((m) => m.pattern),
-        excludes: excludes && excludes.map((m) => m.pattern)
+        includes: includes && includes.map(m => m.pattern),
+        excludes: excludes && excludes.map(m => m.pattern)
     };
 }
 
@@ -116,15 +116,15 @@ class OverrideTester {
 
         // Rejects absolute paths or relative paths to parents.
         for (const pattern of includePatterns) {
-            if (path.isAbsolute(pattern) || pattern.includes('..')) {
+            if (path.isAbsolute(pattern) || pattern.includes("..")) {
                 throw new Error(`Invalid override pattern (expected relative path not containing '..'): ${pattern}`);
             }
-            if (pattern.endsWith('*')) {
+            if (pattern.endsWith("*")) {
                 endsWithWildcard = true;
             }
         }
         for (const pattern of excludePatterns) {
-            if (path.isAbsolute(pattern) || pattern.includes('..')) {
+            if (path.isAbsolute(pattern) || pattern.includes("..")) {
                 throw new Error(`Invalid override pattern (expected relative path not containing '..'): ${pattern}`);
             }
         }
@@ -178,15 +178,14 @@ class OverrideTester {
      * @returns {boolean} `true` if the path was matched.
      */
     test(filePath: string) {
-        if (typeof filePath !== 'string' || !path.isAbsolute(filePath)) {
+        if (typeof filePath !== "string" || !path.isAbsolute(filePath)) {
             throw new Error(`'filePath' should be an absolute path, but got ${filePath}.`);
         }
         const relativePath = path.relative(this.basePath, filePath);
 
         return this.patterns.every(
             ({ includes, excludes }) =>
-                (!includes || includes.some((m) => m.match(relativePath))) &&
-                (!excludes || !excludes.some((m) => m.match(relativePath)))
+                (!includes || includes.some(m => m.match(relativePath))) && (!excludes || !excludes.some(m => m.match(relativePath)))
         );
     }
 

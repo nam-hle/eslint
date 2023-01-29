@@ -7,7 +7,7 @@
  * `Module.createRequire` is added in v12.2.0. It supports URL as well.
  * We only support the case where the argument is a filepath, not a URL.
  */
-import { createRequire } from 'module';
+import { createRequire } from "module";
 
 /**
  * Resolves a Node module relative to another module
@@ -22,9 +22,9 @@ function resolve(moduleName: string, relativeToPath: string) {
     } catch (error: any) {
         // This `if` block is for older Node.js than 12.0.0. We can remove this block in the future.
         if (
-            typeof error === 'object' &&
+            typeof error === "object" &&
             error !== null &&
-            error.code === 'MODULE_NOT_FOUND' &&
+            error.code === "MODULE_NOT_FOUND" &&
             !error.requireStack &&
             error.message.includes(moduleName)
         ) {

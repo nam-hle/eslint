@@ -4,11 +4,10 @@
  */
 "use strict";
 
+import { FormatterResults } from "@eslint/types";
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
 import table from "text-table";
-
-import { FormatterResults } from "../../shared/types";
 
 //------------------------------------------------------------------------------
 // Helpers

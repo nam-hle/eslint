@@ -4,45 +4,45 @@
  */
 
 const baseConfigProperties = {
-    $schema: { type: 'string' },
-    env: { type: 'object' },
-    extends: { $ref: '#/definitions/stringOrStrings' },
-    globals: { type: 'object' },
+    $schema: { type: "string" },
+    env: { type: "object" },
+    extends: { $ref: "#/definitions/stringOrStrings" },
+    globals: { type: "object" },
     overrides: {
-        type: 'array',
-        items: { $ref: '#/definitions/overrideConfig' },
+        type: "array",
+        items: { $ref: "#/definitions/overrideConfig" },
         additionalItems: false
     },
-    parser: { type: ['string', 'null'] },
-    parserOptions: { type: 'object' },
-    plugins: { type: 'array' },
-    processor: { type: 'string' },
-    rules: { type: 'object' },
-    settings: { type: 'object' },
-    noInlineConfig: { type: 'boolean' },
-    reportUnusedDisableDirectives: { type: 'boolean' },
+    parser: { type: ["string", "null"] },
+    parserOptions: { type: "object" },
+    plugins: { type: "array" },
+    processor: { type: "string" },
+    rules: { type: "object" },
+    settings: { type: "object" },
+    noInlineConfig: { type: "boolean" },
+    reportUnusedDisableDirectives: { type: "boolean" },
 
-    ecmaFeatures: { type: 'object' } // deprecated; logs a warning when used
+    ecmaFeatures: { type: "object" } // deprecated; logs a warning when used
 };
 
 const configSchema = {
     definitions: {
         stringOrStrings: {
             oneOf: [
-                { type: 'string' },
+                { type: "string" },
                 {
-                    type: 'array',
-                    items: { type: 'string' },
+                    type: "array",
+                    items: { type: "string" },
                     additionalItems: false
                 }
             ]
         },
         stringOrStringsRequired: {
             oneOf: [
-                { type: 'string' },
+                { type: "string" },
                 {
-                    type: 'array',
-                    items: { type: 'string' },
+                    type: "array",
+                    items: { type: "string" },
                     additionalItems: false,
                     minItems: 1
                 }
@@ -51,10 +51,10 @@ const configSchema = {
 
         // Config at top-level.
         objectConfig: {
-            type: 'object',
+            type: "object",
             properties: {
-                root: { type: 'boolean' },
-                ignorePatterns: { $ref: '#/definitions/stringOrStrings' },
+                root: { type: "boolean" },
+                ignorePatterns: { $ref: "#/definitions/stringOrStrings" },
                 ...baseConfigProperties
             },
             additionalProperties: false
@@ -62,18 +62,18 @@ const configSchema = {
 
         // Config in `overrides`.
         overrideConfig: {
-            type: 'object',
+            type: "object",
             properties: {
-                excludedFiles: { $ref: '#/definitions/stringOrStrings' },
-                files: { $ref: '#/definitions/stringOrStringsRequired' },
+                excludedFiles: { $ref: "#/definitions/stringOrStrings" },
+                files: { $ref: "#/definitions/stringOrStringsRequired" },
                 ...baseConfigProperties
             },
-            required: ['files'],
+            required: ["files"],
             additionalProperties: false
         }
     },
 
-    $ref: '#/definitions/objectConfig'
+    $ref: "#/definitions/objectConfig"
 };
 
 export default configSchema;

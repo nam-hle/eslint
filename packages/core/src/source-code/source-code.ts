@@ -8,12 +8,12 @@
 // Requirements
 //------------------------------------------------------------------------------
 
+import { ScopeManager, Token } from "@eslint/types";
 import { isCommentToken } from "eslint-utils";
 
 import { ASTNode, Position, RootAST } from "../estree";
 import * as astUtils from "../shared/ast-utils";
 import Traverser from "../shared/traverser";
-import { ScopeManager, Token } from "../shared/types";
 
 import TokenStore from "./token-store";
 

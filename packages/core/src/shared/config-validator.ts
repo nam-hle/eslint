@@ -24,6 +24,8 @@
 import util from "util";
 
 import { Legacy } from "@eslint/eslintrc";
+import type { ConfigArray } from "@eslint/eslintrc";
+import { Rule, Processor, RuleConf, SeverityConf, SeverityString, ConfigData, Environment } from "@eslint/types";
 import { ErrorObject, ValidateFunction } from "ajv";
 
 import configSchema from "../conf/config-schema";
@@ -32,7 +34,6 @@ import BuiltInRules from "../rules";
 import Ajv from "./ajv";
 import { assert } from "./assert";
 import { emitDeprecationWarning } from "./deprecation-warnings";
-import { Rule, Processor, RuleConf, SeverityConf, SeverityString, ConfigArray, ConfigData, Environment } from "./types";
 
 const ajv = Ajv();
 const ruleValidators = new WeakMap<Rule, ValidateFunction>();

@@ -4,7 +4,7 @@
  */
 "use strict";
 
-import { FormatterMessage } from "../../shared/types";
+import { FormatterMessage } from "@eslint/types";
 
 //------------------------------------------------------------------------------
 // Helpers

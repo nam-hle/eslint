@@ -14,6 +14,8 @@ import path from "path";
 import { pathToFileURL } from "url";
 
 import { Legacy } from "@eslint/eslintrc";
+import type { ExtractedConfig } from "@eslint/eslintrc";
+import { Rule, ConfigData, LintMessage, LintResult, ResultsMeta, Plugin, DeprecatedRuleInfo } from "@eslint/types";
 import Debug from "debug";
 import findUp from "find-up";
 import { JSONSchema4 } from "json-schema";
@@ -25,7 +27,6 @@ import { FlatConfigArray } from "../config/flat-config-array";
 import { getRuleFromConfig } from "../config/flat-config-helpers";
 import { Linter } from "../linter";
 import { packageJson } from "../shared/package";
-import { Rule, ConfigData, LintMessage, LintResult, ResultsMeta, Plugin, ExtractedConfig, DeprecatedRuleInfo } from "../shared/types";
 
 import { ESLintOptions } from "./eslint";
 import {

@@ -5,10 +5,10 @@
 
 "use strict";
 
+import { SafeEmitter } from "@eslint/types";
 import esquery from "esquery";
 
 import { ASTNode, Node } from "../estree";
-import { SafeEmitter } from "../shared/types";
 
 //------------------------------------------------------------------------------
 // Requirements

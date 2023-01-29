@@ -11,12 +11,12 @@
 import assert from "assert";
 import fs from "fs";
 
+import { ConfigArray } from "@eslint/eslintrc";
 import Debug from "debug";
 import fileEntryCache, { FileEntryCache } from "file-entry-cache";
 import stringify from "json-stable-stringify-without-jsonify";
 
 import { packageJson } from "../shared/package";
-import { ConfigArray } from "../shared/types";
 
 import hash from "./hash";
 

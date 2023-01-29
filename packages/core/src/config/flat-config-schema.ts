@@ -5,9 +5,7 @@
 
 "use strict";
 
-import { GlobalConf, SeverityNumber } from "@eslint/eslintrc";
-
-import { LanguageOptions, Plugin, Processor, RuleConf, SeverityConf } from "../shared/types";
+import { GlobalConf, SeverityNumber, LanguageOptions, Plugin, Processor, RuleConf, SeverityConf } from "@eslint/types";
 
 //-----------------------------------------------------------------------------
 // Type Definitions

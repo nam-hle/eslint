@@ -8,7 +8,8 @@
     "test": "npm run test --ws --if-present",
     "start": "run-p start:*",
     "start:core": "npm start --workspace=packages/core",
-    "start:eslintrc": "npm start --workspace=packages/eslintrc"
+    "start:eslintrc": "npm start --workspace=packages/eslintrc",
+    "lint": "eslint ./packages/*/src --ext .ts,.tsx --fix"
   },
   "repository": "eslint/eslint",
   "funding": "https://opencollective.com/eslint",

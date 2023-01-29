@@ -3,7 +3,7 @@
 // Definitions by: RReverser <https://github.com/RReverser>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-import { Token } from "./shared/types";
+import { Token } from "@eslint/types";
 
 // This definition file follows a somewhat unusual format. ESTree allows
 // runtime type checks based on the `type` parameter. In order to explain this
