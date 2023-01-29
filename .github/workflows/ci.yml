@@ -54,6 +54,8 @@ jobs:
         node-version: ${{ matrix.node }}
     - name: Install Packages
       run: npm install
+    - name: Compile
+      run: npm run compile
     - name: Test
       run: npm run test
 #    - name: Fuzz Test

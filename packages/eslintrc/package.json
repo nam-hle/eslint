@@ -27,12 +27,12 @@
     "access": "public"
   },
   "scripts": {
-    "prepare": "npm run compile && npm run build",
     "compile": "tsc",
     "start": "tsc --watch --pretty",
-    "build": "rollup -c",
+    "postcompile": "rollup -c",
     "lint": "eslint . --report-unused-disable-directives",
     "fix": "npm run lint -- --fix",
+    "pretest": "npm run compile",
     "test": "mocha -R progress -c 'tests/lib/*.cjs' && c8 mocha -R progress -c 'tests/lib/**/*.js'",
     "test:watch": "nodemon",
     "generate-release": "eslint-generate-release",

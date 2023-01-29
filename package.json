@@ -6,6 +6,10 @@
   "description": "An AST-based pattern checker for JavaScript.",
   "scripts": {
     "test": "npm run test --ws --if-present",
+    "compile": "run-s compile:types compile:eslintrc compile:core",
+    "compile:types": "npm run compile --workspace=packages/types",
+    "compile:eslintrc": "npm run compile --workspace=packages/eslintrc",
+    "compile:core": "npm run compile --workspace=packages/core",
     "start": "run-p start:*",
     "start:core": "npm start --workspace=packages/core",
     "start:eslintrc": "npm start --workspace=packages/eslintrc",
