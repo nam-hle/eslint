@@ -9,15 +9,15 @@
 // Requirements
 //-----------------------------------------------------------------------------
 
-import path from 'path';
+import path from "path";
 
-import createDebug from 'debug';
+import { Environment, Processor } from "@eslint/types";
+import createDebug from "debug";
 
-import environments from '../conf/environments.js';
+import environments from "../conf/environments.js";
 
-import { ConfigArrayFactory } from './config-array-factory.js';
-import { assert } from './shared/assert.js';
-import { Environment, Processor } from './shared/types.js';
+import { ConfigArrayFactory } from "./config-array-factory.js";
+import { assert } from "./shared/assert.js";
 
 //-----------------------------------------------------------------------------
 // Helpers
@@ -26,8 +26,8 @@ import { Environment, Processor } from './shared/types.js';
 /** @typedef {import("../../shared/types").Environment} Environment */
 /** @typedef {import("../../shared/types").Processor} Processor */
 
-const debug = createDebug('eslintrc:flat-compat');
-const cafactory = Symbol('cafactory');
+const debug = createDebug("eslintrc:flat-compat");
+const cafactory = Symbol("cafactory");
 
 /**
  * Translates an ESLintRC-style config object into a flag-config-style config
@@ -58,35 +58,35 @@ function translateESLintRC(
     const configs = [];
     const languageOptions: Record<string, any> = {};
     const linterOptions: Record<string, any> = {};
-    const keysToCopy = ['settings', 'rules', 'processor'];
-    const languageOptionsKeysToCopy = ['globals', 'parser', 'parserOptions'];
-    const linterOptionsKeysToCopy = ['noInlineConfig', 'reportUnusedDisableDirectives'];
+    const keysToCopy = ["settings", "rules", "processor"];
+    const languageOptionsKeysToCopy = ["globals", "parser", "parserOptions"];
+    const linterOptionsKeysToCopy = ["noInlineConfig", "reportUnusedDisableDirectives"];
 
     // check for special settings for eslint:all and eslint:recommended:
     if (eslintrcConfig.settings) {
-        if (eslintrcConfig.settings['eslint:all'] === true) {
-            return ['eslint:all'];
+        if (eslintrcConfig.settings["eslint:all"] === true) {
+            return ["eslint:all"];
         }
 
-        if (eslintrcConfig.settings['eslint:recommended'] === true) {
-            return ['eslint:recommended'];
+        if (eslintrcConfig.settings["eslint:recommended"] === true) {
+            return ["eslint:recommended"];
         }
     }
 
     // copy over simple translations
     for (const key of keysToCopy) {
-        if (key in eslintrcConfig && typeof eslintrcConfig[key] !== 'undefined') {
+        if (key in eslintrcConfig && typeof eslintrcConfig[key] !== "undefined") {
             flatConfig[key] = eslintrcConfig[key];
         }
     }
 
     // copy over languageOptions
     for (const key of languageOptionsKeysToCopy) {
-        if (key in eslintrcConfig && typeof eslintrcConfig[key] !== 'undefined') {
+        if (key in eslintrcConfig && typeof eslintrcConfig[key] !== "undefined") {
             // create the languageOptions key in the flat config
             flatConfig.languageOptions = languageOptions;
 
-            if (key === 'parser') {
+            if (key === "parser") {
                 debug(`Resolving parser '${languageOptions[key]}' relative to ${resolveConfigRelativeTo}`);
 
                 if (eslintrcConfig[key].error) {
@@ -98,7 +98,7 @@ function translateESLintRC(
             }
 
             // clone any object values that are in the eslintrc config
-            if (eslintrcConfig[key] && typeof eslintrcConfig[key] === 'object') {
+            if (eslintrcConfig[key] && typeof eslintrcConfig[key] === "object") {
                 languageOptions[key] = {
                     ...eslintrcConfig[key]
                 };
@@ -110,7 +110,7 @@ function translateESLintRC(
 
     // copy over linterOptions
     for (const key of linterOptionsKeysToCopy) {
-        if (key in eslintrcConfig && typeof eslintrcConfig[key] !== 'undefined') {
+        if (key in eslintrcConfig && typeof eslintrcConfig[key] !== "undefined") {
             flatConfig.linterOptions = linterOptions;
             linterOptions[key] = eslintrcConfig[key];
         }
@@ -118,12 +118,12 @@ function translateESLintRC(
 
     // move ecmaVersion a level up
     if (languageOptions.parserOptions) {
-        if ('ecmaVersion' in languageOptions.parserOptions) {
+        if ("ecmaVersion" in languageOptions.parserOptions) {
             languageOptions.ecmaVersion = languageOptions.parserOptions.ecmaVersion;
             delete languageOptions.parserOptions.ecmaVersion;
         }
 
-        if ('sourceType' in languageOptions.parserOptions) {
+        if ("sourceType" in languageOptions.parserOptions) {
             languageOptions.sourceType = languageOptions.parserOptions.sourceType;
             delete languageOptions.parserOptions.sourceType;
         }
@@ -140,7 +140,7 @@ function translateESLintRC(
     }
 
     // translate plugins
-    if (eslintrcConfig.plugins && typeof eslintrcConfig.plugins === 'object') {
+    if (eslintrcConfig.plugins && typeof eslintrcConfig.plugins === "object") {
         debug(`Translating plugins: ${eslintrcConfig.plugins}`);
 
         flatConfig.plugins = {};
@@ -160,7 +160,7 @@ function translateESLintRC(
             // create a config for any processors
             if (plugin.processors) {
                 for (const processorName of Object.keys(plugin.processors)) {
-                    if (processorName.startsWith('.')) {
+                    if (processorName.startsWith(".")) {
                         debug(`Assigning processor: ${pluginName}/${processorName}`);
 
                         configs.unshift({
@@ -174,7 +174,7 @@ function translateESLintRC(
     }
 
     // translate env - must come after plugins
-    if (eslintrcConfig.env && typeof eslintrcConfig.env === 'object') {
+    if (eslintrcConfig.env && typeof eslintrcConfig.env === "object") {
         for (const envName of Object.keys(eslintrcConfig.env)) {
             // only add environments that are true
             if (eslintrcConfig.env[envName]) {
@@ -231,8 +231,8 @@ class FlatCompat {
         this[cafactory] = new ConfigArrayFactory({
             cwd: baseDirectory,
             resolvePluginsRelativeTo,
-            getEslintAllConfig: () => ({ settings: { 'eslint:all': true } }),
-            getEslintRecommendedConfig: () => ({ settings: { 'eslint:recommended': true } })
+            getEslintAllConfig: () => ({ settings: { "eslint:all": true } }),
+            getEslintRecommendedConfig: () => ({ settings: { "eslint:recommended": true } })
         });
     }
 
@@ -249,13 +249,13 @@ class FlatCompat {
         const flatArray = [];
         let hasIgnorePatterns = false;
 
-        eslintrcArray.forEach((configData) => {
-            if (configData.type === 'config') {
+        eslintrcArray.forEach(configData => {
+            if (configData.type === "config") {
                 hasIgnorePatterns ||= !!configData.ignorePattern;
                 flatArray.push(
                     ...translateESLintRC(configData, {
-                        resolveConfigRelativeTo: path.join(this.baseDirectory, '__placeholder.js'),
-                        resolvePluginsRelativeTo: path.join(this.resolvePluginsRelativeTo, '__placeholder.js'),
+                        resolveConfigRelativeTo: path.join(this.baseDirectory, "__placeholder.js"),
+                        resolvePluginsRelativeTo: path.join(this.resolvePluginsRelativeTo, "__placeholder.js"),
                         pluginEnvironments: eslintrcArray.pluginEnvironments ?? undefined,
                         pluginProcessors: eslintrcArray.pluginProcessors ?? undefined
                     })

@@ -29,20 +29,11 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import {
-    Environment,
-    GlobalConf,
-    ParserOptions,
-    Processor,
-    ResolvedParser,
-    ResolvedPlugin,
-    Rule,
-    RuleConf
-} from '../shared/types.js';
+import { Environment, GlobalConf, ParserOptions, Processor, ResolvedParser, ResolvedPlugin, Rule, RuleConf } from "@eslint/types";
 
-import { ExtractedConfig } from './extracted-config.js';
-import { IgnorePattern } from './ignore-pattern.js';
-import { OverrideTester } from './override-tester.js';
+import { ExtractedConfig } from "./extracted-config.js";
+import { IgnorePattern } from "./ignore-pattern.js";
+import { OverrideTester } from "./override-tester.js";
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -94,7 +85,7 @@ export interface ConfigArrayElement {
     root: boolean | undefined;
     rules: Record<string, RuleConf> | undefined;
     settings: Record<string, unknown> | undefined;
-    type: 'config' | 'ignore' | 'implicit-processor';
+    type: "config" | "ignore" | "implicit-processor";
 }
 
 /**
@@ -157,7 +148,7 @@ function getMatchedIndices(elements: ConfigArrayElement[], filePath: string) {
  * @returns {boolean} `true` if the value is a non-null object.
  */
 function isNonNullObject(x: unknown): x is Record<string, any> {
-    return typeof x === 'object' && x !== null;
+    return typeof x === "object" && x !== null;
 }
 
 /**
@@ -175,7 +166,7 @@ function mergeWithoutOverwrite(target: Record<string, any>, source: Record<strin
     }
 
     for (const key of Object.keys(source)) {
-        if (key === '__proto__') {
+        if (key === "__proto__") {
             continue;
         }
 
@@ -207,10 +198,8 @@ class PluginConflictError extends Error {
      * @param {{filePath:string, importerName:string}[]} plugins The resolved plugins.
      */
     constructor(pluginId: string, plugins: { filePath: string; importerName: string }[]) {
-        super(
-            `Plugin "${pluginId}" was conflicted between ${plugins.map((p) => `"${p.importerName}"`).join(' and ')}.`
-        );
-        this.messageTemplate = 'plugin-conflict';
+        super(`Plugin "${pluginId}" was conflicted between ${plugins.map(p => `"${p.importerName}"`).join(" and ")}.`);
+        this.messageTemplate = "plugin-conflict";
         this.messageData = { pluginId, plugins };
     }
 }
@@ -228,7 +217,7 @@ function mergePlugins(target: Record<string, ResolvedPlugin>, source: Record<str
     }
 
     for (const key of Object.keys(source)) {
-        if (key === '__proto__') {
+        if (key === "__proto__") {
             continue;
         }
         const targetValue = target[key];
@@ -270,7 +259,7 @@ function mergeRuleConfigs(target: Record<string, any[]>, source: Record<string, 
     }
 
     for (const key of Object.keys(source)) {
-        if (key === '__proto__') {
+        if (key === "__proto__") {
             continue;
         }
         const targetDef = target[key];
@@ -363,12 +352,7 @@ function createConfig(instance: ConfigArray, indices: number[]): ExtractedConfig
  * @param {function(T): U} [normalize?] The normalize function for each value.
  * @returns {void}
  */
-function collect<T, U extends T>(
-    pluginId: string,
-    defs: Record<string, T>,
-    map: Map<string, U>,
-    normalize?: (t: T) => U
-) {
+function collect<T, U extends T>(pluginId: string, defs: Record<string, T>, map: Map<string, U>, normalize?: (t: T) => U) {
     if (defs) {
         const prefix = pluginId && `${pluginId}/`;
 
@@ -385,7 +369,7 @@ function collect<T, U extends T>(
  * @returns {Rule} The normalized rule definition.
  */
 function normalizePluginRule(rule: ((...args: any[]) => any) | Rule) {
-    return typeof rule === 'function' ? { create: rule } : rule;
+    return typeof rule === "function" ? { create: rule } : rule;
 }
 
 /**
@@ -503,7 +487,7 @@ class ConfigArray extends Array<ConfigArrayElement> {
         for (let i = this.length - 1; i >= 0; --i) {
             const root = this[i].root;
 
-            if (typeof root === 'boolean') {
+            if (typeof root === "boolean") {
                 return root;
             }
         }
@@ -518,7 +502,7 @@ class ConfigArray extends Array<ConfigArrayElement> {
     extractConfig(filePath: string) {
         const { cache } = internalSlotsMap.get(this);
         const indices = getMatchedIndices(this, filePath);
-        const cacheKey = indices.join(',');
+        const cacheKey = indices.join(",");
 
         if (!cache.has(cacheKey)) {
             cache.set(cacheKey, createConfig(this, indices));
@@ -534,7 +518,7 @@ class ConfigArray extends Array<ConfigArrayElement> {
      */
     isAdditionalTargetPath(filePath: string) {
         for (const { criteria, type } of this) {
-            if (type === 'config' && criteria && !criteria.endsWithWildcard && criteria.test(filePath)) {
+            if (type === "config" && criteria && !criteria.endsWithWildcard && criteria.test(filePath)) {
                 return true;
             }
         }

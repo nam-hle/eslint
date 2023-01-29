@@ -3,14 +3,14 @@
  * @author Toru Nagashima <https://github.com/mysticatea>
  */
 
-import type { JSONSchema4 } from 'json-schema';
+import type { JSONSchema4 } from "json-schema";
 
 /** @typedef {boolean | "off" | "readable" | "readonly" | "writable" | "writeable"} GlobalConf */
 /** @typedef {0 | 1 | 2 | "off" | "warn" | "error"} SeverityConf */
 /** @typedef {SeverityConf | [SeverityConf, ...any[]]} RuleConf */
 
-export type GlobalConf = boolean | 'off' | 'readable' | 'readonly' | 'writable' | 'writeable';
-export type SeverityString = 'off' | 'warn' | 'error';
+export type GlobalConf = boolean | "off" | "readable" | "readonly" | "writable" | "writeable";
+export type SeverityString = "off" | "warn" | "error";
 export type SeverityNumber = 0 | 1 | 2;
 export type SeverityConf = SeverityString | SeverityNumber;
 export type RuleConf = SeverityConf | [SeverityConf, ...unknown[]];
@@ -39,7 +39,7 @@ export interface ParserOptions {
     ecmaFeatures?: EcmaFeatures;
     // prettier-ignore
     ecmaVersion?: 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021;
-    sourceType?: 'script' | 'module';
+    sourceType?: "script" | "module";
 }
 
 /**
@@ -256,12 +256,12 @@ export interface RuleMetaDocs {
 export interface RuleMeta {
     deprecated?: boolean;
     docs: RuleMetaDocs;
-    fixable?: 'code' | 'whitespace' | 'problem' | 'suggestion' | 'layout';
+    fixable?: "code" | "whitespace" | "problem" | "suggestion" | "layout";
     hasSuggestions?: boolean;
     messages?: Record<string, string>;
     replacedBy?: string[];
     schema: JSONSchema4;
-    type: 'problem' | 'suggestion' | 'layout';
+    type: "problem" | "suggestion" | "layout";
 }
 
 /**
@@ -269,12 +269,6 @@ export interface RuleMeta {
  * @property {Function} create The factory of the rule.
  * @property {RuleMeta} meta The meta data of the rule.
  */
-
-export interface Rule {
-    schema?: JSONSchema4;
-    meta?: RuleMeta;
-    create: (...args: any[]) => any;
-}
 
 /**
  * @typedef {Object} Plugin

@@ -7,9 +7,8 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import globals from 'globals';
-
-import { Environment } from '../lib/shared/types.js';
+import { Environment } from "@eslint/types";
+import globals from "globals";
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -129,8 +128,8 @@ const environments = new Map<string, Environment>(
                 }
             }
         },
-        'shared-node-browser': {
-            globals: globals['shared-node-browser']
+        "shared-node-browser": {
+            globals: globals["shared-node-browser"]
         },
         worker: {
             globals: globals.worker

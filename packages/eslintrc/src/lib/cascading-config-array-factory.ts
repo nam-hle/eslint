@@ -22,20 +22,20 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import os from 'os';
-import path from 'path';
+import os from "os";
+import path from "path";
 
-import debugOrig from 'debug';
+import { ConfigData, Plugin, Rule } from "@eslint/types";
+import debugOrig from "debug";
 
-import { ConfigArray, ConfigDependency, IgnorePattern } from './config-array/index.js';
-import { ConfigArrayFactory } from './config-array-factory.js';
-import { assert } from './shared/assert.js';
-import ConfigValidator from './shared/config-validator.js';
-import { emitDeprecationWarning } from './shared/deprecation-warnings.js';
-import { ModuleResolver } from './shared/relative-module-resolver.js';
-import { ConfigData, Plugin, Rule } from './shared/types.js';
+import { ConfigArray, ConfigDependency, IgnorePattern } from "./config-array/index.js";
+import { ConfigArrayFactory } from "./config-array-factory.js";
+import { assert } from "./shared/assert.js";
+import ConfigValidator from "./shared/config-validator.js";
+import { emitDeprecationWarning } from "./shared/deprecation-warnings.js";
+import { ModuleResolver } from "./shared/relative-module-resolver.js";
 
-const debug = debugOrig('eslintrc:cascading-config-array-factory');
+const debug = debugOrig("eslintrc:cascading-config-array-factory");
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -140,14 +140,11 @@ const internalSlotsMap = new WeakMap<CascadingConfigArrayFactory, CascadingConfi
  * @returns {ConfigArray} The config array of the base configs.
  */
 function createBaseConfigArray(
-    slots: Pick<
-        CascadingConfigArrayFactoryInternalSlots,
-        'configArrayFactory' | 'baseConfigData' | 'rulePaths' | 'cwd' | 'loadRules'
-    >
+    slots: Pick<CascadingConfigArrayFactoryInternalSlots, "configArrayFactory" | "baseConfigData" | "rulePaths" | "cwd" | "loadRules">
 ) {
     const { configArrayFactory, baseConfigData, rulePaths, cwd, loadRules } = slots;
     const baseConfigArray = configArrayFactory.create(baseConfigData ?? null, {
-        name: 'BaseConfig'
+        name: "BaseConfig"
     });
 
     /*
@@ -156,10 +153,7 @@ function createBaseConfigArray(
      * patterns in the current working directory.
      */
     baseConfigArray.unshift(
-        configArrayFactory.create(
-            { ignorePatterns: IgnorePattern.DefaultPatterns },
-            { name: 'DefaultIgnorePattern' }
-        )[0]
+        configArrayFactory.create({ ignorePatterns: IgnorePattern.DefaultPatterns }, { name: "DefaultIgnorePattern" })[0]
     );
 
     /*
@@ -169,19 +163,19 @@ function createBaseConfigArray(
      */
     if (loadRules && rulePaths && rulePaths.length > 0) {
         baseConfigArray.push({
-            type: 'config',
-            name: '--rulesdir',
-            filePath: '',
+            type: "config",
+            name: "--rulesdir",
+            filePath: "",
             plugins: {
                 // @ts-ignore
-                '': new ConfigDependency({
+                "": new ConfigDependency({
                     definition: {
                         rules: rulePaths.reduce((map, rulePath) => Object.assign(map, loadRules(rulePath, cwd)), {})
                     },
-                    filePath: '',
-                    id: '',
-                    importerName: '--rulesdir',
-                    importerPath: ''
+                    filePath: "",
+                    id: "",
+                    importerName: "--rulesdir",
+                    importerPath: ""
                 })
             }
         });
@@ -198,18 +192,18 @@ function createBaseConfigArray(
 function createCLIConfigArray(
     slots: Pick<
         CascadingConfigArrayFactoryInternalSlots,
-        'cliConfigData' | 'configArrayFactory' | 'cwd' | 'ignorePath' | 'specificConfigPath'
+        "cliConfigData" | "configArrayFactory" | "cwd" | "ignorePath" | "specificConfigPath"
     >
 ) {
     const { cliConfigData, configArrayFactory, cwd, ignorePath, specificConfigPath } = slots;
-    const cliConfigArray = configArrayFactory.create(cliConfigData ?? null, { name: 'CLIOptions' });
+    const cliConfigArray = configArrayFactory.create(cliConfigData ?? null, { name: "CLIOptions" });
 
     cliConfigArray.unshift(
         ...(ignorePath ? configArrayFactory.loadESLintIgnore(ignorePath) : configArrayFactory.loadDefaultESLintIgnore())
     );
 
     if (specificConfigPath) {
-        cliConfigArray.unshift(...configArrayFactory.loadFile(specificConfigPath, { name: '--config', basePath: cwd }));
+        cliConfigArray.unshift(...configArrayFactory.loadFile(specificConfigPath, { name: "--config", basePath: cwd }));
     }
 
     return cliConfigArray;
@@ -226,7 +220,7 @@ class ConfigurationNotFoundError extends Error {
      */
     constructor(directoryPath: string) {
         super(`No ESLint configuration found in ${directoryPath}.`);
-        this.messageTemplate = 'no-config-found';
+        this.messageTemplate = "no-config-found";
         this.messageData = { directoryPath };
     }
 }
@@ -337,11 +331,7 @@ class CascadingConfigArrayFactory {
 
         debug(`Load config files for ${directoryPath}.`);
 
-        return this._finalizeConfigArray(
-            this._loadConfigInAncestors(directoryPath),
-            directoryPath,
-            ignoreNotFoundError
-        );
+        return this._finalizeConfigArray(this._loadConfigInAncestors(directoryPath), directoryPath, ignoreNotFoundError);
     }
 
     /**
@@ -400,12 +390,12 @@ class CascadingConfigArrayFactory {
 
         // Consider this is root.
         if (directoryPath === homePath && cwd !== homePath) {
-            debug('Stop traversing because of considered root.');
+            debug("Stop traversing because of considered root.");
             if (configsExistInSubdirs) {
                 const filePath = ConfigArrayFactory.getPathToConfigFileInDirectory(directoryPath);
 
                 if (filePath) {
-                    emitDeprecationWarning(filePath, 'ESLINT_PERSONAL_CONFIG_SUPPRESS');
+                    emitDeprecationWarning(filePath, "ESLINT_PERSONAL_CONFIG_SUPPRESS");
                 }
             }
             return this._cacheConfig(directoryPath, baseConfigArray);
@@ -416,7 +406,7 @@ class CascadingConfigArrayFactory {
             configArray = configArrayFactory.loadInDirectory(directoryPath);
         } catch (error: any) {
             /* istanbul ignore next */
-            if (error.code === 'EACCES') {
+            if (error.code === "EACCES") {
                 debug("Stop traversing because of 'EACCES' error.");
                 return this._cacheConfig(directoryPath, baseConfigArray);
             }
@@ -486,21 +476,21 @@ class CascadingConfigArrayFactory {
             // Load the personal config if there are no regular config files.
             if (
                 useEslintrc &&
-                configArray.every((c) => !c.filePath) &&
-                cliConfigArray?.every((c) => !c.filePath) // `--config` option can be a file.
+                configArray.every(c => !c.filePath) &&
+                cliConfigArray?.every(c => !c.filePath) // `--config` option can be a file.
             ) {
                 const homePath = os.homedir();
 
-                debug('Loading the config file of the home directory:', homePath);
+                debug("Loading the config file of the home directory:", homePath);
 
                 const personalConfigArray = configArrayFactory.loadInDirectory(homePath, {
-                    name: 'PersonalConfig'
+                    name: "PersonalConfig"
                 });
 
                 if (personalConfigArray.length > 0 && !directoryPath.startsWith(homePath)) {
                     const lastElement = personalConfigArray[personalConfigArray.length - 1];
 
-                    emitDeprecationWarning(lastElement.filePath, 'ESLINT_PERSONAL_CONFIG_LOAD');
+                    emitDeprecationWarning(lastElement.filePath, "ESLINT_PERSONAL_CONFIG_LOAD");
                 }
 
                 finalConfigArray = finalConfigArray.concat(personalConfigArray);
@@ -522,7 +512,7 @@ class CascadingConfigArrayFactory {
             Object.freeze(finalConfigArray);
             finalizeCache.set(configArray, finalConfigArray);
 
-            debug('Configuration was determined: %o on %s', finalConfigArray, directoryPath);
+            debug("Configuration was determined: %o on %s", finalConfigArray, directoryPath);
         }
 
         // At least one element (the default ignore patterns) exists.

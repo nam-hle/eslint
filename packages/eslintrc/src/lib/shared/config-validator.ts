@@ -9,30 +9,21 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import util from 'util';
+import util from "util";
 
-import { ErrorObject, ValidateFunction } from 'ajv';
-import { JSONSchema4 } from 'json-schema';
+import { ConfigData, Environment, Processor, Rule, RuleConf, SeverityConf, SeverityNumber, SeverityString } from "@eslint/types";
+import { ErrorObject, ValidateFunction } from "ajv";
+import { JSONSchema4 } from "json-schema";
 
-import configSchema from '../../conf/config-schema.js';
-import BuiltInEnvironments from '../../conf/environments.js';
+import configSchema from "../../conf/config-schema.js";
+import BuiltInEnvironments from "../../conf/environments.js";
 
-import { ConfigArray } from '../config-array/index.js';
+import { ConfigArray } from "../config-array/index.js";
 
-import ajvOrig from './ajv.js';
-import { assert } from './assert.js';
-import * as ConfigOps from './config-ops.js';
-import { emitDeprecationWarning } from './deprecation-warnings.js';
-import {
-    ConfigData,
-    Environment,
-    Processor,
-    Rule,
-    RuleConf,
-    SeverityConf,
-    SeverityNumber,
-    SeverityString
-} from './types.js';
+import ajvOrig from "./ajv.js";
+import { assert } from "./assert.js";
+import * as ConfigOps from "./config-ops.js";
+import { emitDeprecationWarning } from "./deprecation-warnings.js";
 
 const ajv = ajvOrig();
 
@@ -77,14 +68,14 @@ export default class ConfigValidator {
         if (Array.isArray(schema)) {
             if (schema.length) {
                 return {
-                    type: 'array',
+                    type: "array",
                     items: schema,
                     minItems: 0,
                     maxItems: schema.length
                 };
             }
             return {
-                type: 'array',
+                type: "array",
                 minItems: 0,
                 maxItems: 0
             };
@@ -101,8 +92,7 @@ export default class ConfigValidator {
      */
     validateRuleSeverity(options: RuleConf): SeverityConf {
         const severity = Array.isArray(options) ? options[0] : options;
-        const normSeverity =
-            typeof severity === 'string' ? severityMap[severity.toLowerCase() as SeverityString] : severity;
+        const normSeverity = typeof severity === "string" ? severityMap[severity.toLowerCase() as SeverityString] : severity;
 
         if (normSeverity === 0 || normSeverity === 1 || normSeverity === 2) {
             return normSeverity;
@@ -112,7 +102,7 @@ export default class ConfigValidator {
             `\tSeverity should be one of the following: 0 = off, 1 = warn, 2 = error (you passed '${util
                 .inspect(severity)
                 .replace(/'/gu, '"')
-                .replace(/\n/gu, '')}').\n`
+                .replace(/\n/gu, "")}').\n`
         );
     }
 
@@ -136,11 +126,7 @@ export default class ConfigValidator {
         if (validateRule) {
             validateRule(localOptions);
             if (validateRule.errors) {
-                throw new Error(
-                    validateRule.errors
-                        .map((error) => `\tValue ${JSON.stringify(error.data)} ${error.message}.\n`)
-                        .join('')
-                );
+                throw new Error(validateRule.errors.map(error => `\tValue ${JSON.stringify(error.data)} ${error.message}.\n`).join(""));
             }
         }
     }
@@ -164,7 +150,7 @@ export default class ConfigValidator {
         } catch (err: any) {
             const enhancedMessage = `Configuration for rule "${ruleId}" is invalid:\n${err.message}`;
 
-            if (typeof source === 'string') {
+            if (typeof source === "string") {
                 throw new Error(`${source}:\n\t${enhancedMessage}`);
             } else {
                 throw new Error(enhancedMessage);
@@ -185,7 +171,7 @@ export default class ConfigValidator {
             return;
         }
 
-        Object.keys(environment).forEach((id) => {
+        Object.keys(environment).forEach(id => {
             const env = getAdditionalEnv(id) || BuiltInEnvironments.get(id) || null;
 
             if (!env) {
@@ -208,7 +194,7 @@ export default class ConfigValidator {
             return;
         }
 
-        Object.keys(rulesConfig).forEach((id) => {
+        Object.keys(rulesConfig).forEach(id => {
             const rule = getAdditionalRule(id) || this.builtInRules.get(id) || null;
 
             this.validateRuleOptions(rule, id, rulesConfig[id], source);
@@ -230,9 +216,7 @@ export default class ConfigValidator {
             try {
                 ConfigOps.normalizeConfigGlobal(configuredValue);
             } catch (err: any) {
-                throw new Error(
-                    `ESLint configuration of global '${configuredGlobal}' in ${source} is invalid:\n${err.message}`
-                );
+                throw new Error(`ESLint configuration of global '${configuredGlobal}' in ${source} is invalid:\n${err.message}`);
             }
         });
     }
@@ -246,9 +230,7 @@ export default class ConfigValidator {
      */
     validateProcessor(processorName: string | undefined, source: string, getProcessor: (id: string) => Processor) {
         if (processorName && !getProcessor(processorName)) {
-            throw new Error(
-                `ESLint configuration of processor in '${source}' is invalid: '${processorName}' was not found.`
-            );
+            throw new Error(`ESLint configuration of processor in '${source}' is invalid: '${processorName}' was not found.`);
         }
     }
 
@@ -259,9 +241,9 @@ export default class ConfigValidator {
      */
     formatErrors(errors: ErrorObject[]) {
         return errors
-            .map((error) => {
-                if (error.keyword === 'additionalProperties') {
-                    assert('additionalProperty' in error.params);
+            .map(error => {
+                if (error.keyword === "additionalProperties") {
+                    assert("additionalProperty" in error.params);
 
                     const formattedPropertyPath = error.dataPath.length
                         ? `${error.dataPath.slice(1)}.${error.params.additionalProperty}`
@@ -269,20 +251,20 @@ export default class ConfigValidator {
 
                     return `Unexpected top-level property "${formattedPropertyPath}"`;
                 }
-                if (error.keyword === 'type') {
+                if (error.keyword === "type") {
                     const formattedField = error.dataPath.slice(1);
-                    const formattedExpectedType = Array.isArray(error.schema) ? error.schema.join('/') : error.schema;
+                    const formattedExpectedType = Array.isArray(error.schema) ? error.schema.join("/") : error.schema;
                     const formattedValue = JSON.stringify(error.data);
 
                     return `Property "${formattedField}" is the wrong type (expected ${formattedExpectedType} but got \`${formattedValue}\`)`;
                 }
 
-                const field = error.dataPath[0] === '.' ? error.dataPath.slice(1) : error.dataPath;
+                const field = error.dataPath[0] === "." ? error.dataPath.slice(1) : error.dataPath;
 
                 return `"${field}" ${error.message}. Value: ${JSON.stringify(error.data)}`;
             })
-            .map((message) => `\t- ${message}.\n`)
-            .join('');
+            .map(message => `\t- ${message}.\n`)
+            .join("");
     }
 
     /**
@@ -295,13 +277,11 @@ export default class ConfigValidator {
         validateSchema ||= ajv.compile(configSchema);
 
         if (!validateSchema(config)) {
-            throw new Error(
-                `ESLint configuration in ${source} is invalid:\n${this.formatErrors(validateSchema.errors ?? [])}`
-            );
+            throw new Error(`ESLint configuration in ${source} is invalid:\n${this.formatErrors(validateSchema.errors ?? [])}`);
         }
 
-        if (Object.hasOwnProperty.call(config, 'ecmaFeatures')) {
-            emitDeprecationWarning(source, 'ESLINT_LEGACY_ECMAFEATURES');
+        if (Object.hasOwnProperty.call(config, "ecmaFeatures")) {
+            emitDeprecationWarning(source, "ESLINT_LEGACY_ECMAFEATURES");
         }
     }
 

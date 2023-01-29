@@ -1,0 +1,42 @@
+{
+    "name": "@eslint/types",
+    "version": "1.4.1-beta.2",
+    "description": "The legacy ESLintRC config file format for ESLint",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./lib/index.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "src",
+        "lib"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "compile": "tsc",
+        "start": "tsc --watch --pretty"
+    },
+    "repository": "eslint/eslintrc",
+    "funding": "https://opencollective.com/eslint",
+    "keywords": [
+        "ESLint",
+        "ESLintRC",
+        "Configuration"
+    ],
+    "author": "Nicholas C. Zakas",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/eslint/eslintrc/issues"
+    },
+    "homepage": "https://github.com/eslint/eslintrc#readme",
+    "devDependencies": {},
+    "dependencies": {},
+    "engines": {
+        "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
+    }
+}

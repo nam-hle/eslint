@@ -3,20 +3,20 @@
  * so no Node-specific code can be here.
  * @author Nicholas C. Zakas
  */
-import { RuleConf, SeverityConf, SeverityNumber, SeverityString } from './types.js';
+import { RuleConf, SeverityConf, SeverityNumber, SeverityString } from "@eslint/types";
 
 //------------------------------------------------------------------------------
 // Private
 //------------------------------------------------------------------------------
 
-const RULE_SEVERITY_STRINGS: SeverityString[] = ['off', 'warn', 'error'];
+const RULE_SEVERITY_STRINGS: SeverityString[] = ["off", "warn", "error"];
 
 const RULE_SEVERITY: Record<SeverityString, SeverityNumber> = {
     off: 0,
     warn: 1,
     error: 2
 };
-const VALID_SEVERITIES: (SeverityNumber | SeverityString)[] = [0, 1, 2, 'off', 'warn', 'error'];
+const VALID_SEVERITIES: (SeverityNumber | SeverityString)[] = [0, 1, 2, "off", "warn", "error"];
 
 //------------------------------------------------------------------------------
 // Public Interface
@@ -37,7 +37,7 @@ function getRuleSeverity(ruleConfig: RuleConf): SeverityNumber {
         return severityValue;
     }
 
-    if (typeof severityValue === 'string') {
+    if (typeof severityValue === "string") {
         return RULE_SEVERITY[severityValue.toLowerCase() as SeverityString] || 0;
     }
 
@@ -54,12 +54,12 @@ function getRuleSeverity(ruleConfig: RuleConf): SeverityNumber {
 function normalizeToStrings(config: { rules?: Record<string, RuleConf> }) {
     const { rules } = config;
     if (rules) {
-        Object.keys(rules).forEach((ruleId) => {
+        Object.keys(rules).forEach(ruleId => {
             const ruleConfig = rules[ruleId];
 
-            if (typeof ruleConfig === 'number') {
+            if (typeof ruleConfig === "number") {
                 rules[ruleId] = RULE_SEVERITY_STRINGS[ruleConfig] || RULE_SEVERITY_STRINGS[0];
-            } else if (Array.isArray(ruleConfig) && typeof ruleConfig[0] === 'number') {
+            } else if (Array.isArray(ruleConfig) && typeof ruleConfig[0] === "number") {
                 ruleConfig[0] = RULE_SEVERITY_STRINGS[ruleConfig[0]] || RULE_SEVERITY_STRINGS[0];
             }
         });
@@ -83,7 +83,7 @@ function isErrorSeverity(ruleConfig: RuleConf) {
 function isValidSeverity(ruleConfig: RuleConf) {
     let severity: SeverityConf = Array.isArray(ruleConfig) ? ruleConfig[0] : ruleConfig;
 
-    if (typeof severity === 'string') {
+    if (typeof severity === "string") {
         severity = severity.toLowerCase() as SeverityConf;
     }
     return VALID_SEVERITIES.indexOf(severity) !== -1;
@@ -95,7 +95,7 @@ function isValidSeverity(ruleConfig: RuleConf) {
  * @returns {boolean} `true` if the configuration has valid severity.
  */
 function isEverySeverityValid(config: Record<string, RuleConf>) {
-    return Object.keys(config).every((ruleId) => isValidSeverity(config[ruleId]));
+    return Object.keys(config).every(ruleId => isValidSeverity(config[ruleId]));
 }
 
 /**
@@ -105,36 +105,27 @@ function isEverySeverityValid(config: Record<string, RuleConf>) {
  * @returns {("readonly"|"writeable"|"off")} The value normalized as a string
  * @throws Error if global value is invalid
  */
-function normalizeConfigGlobal(configuredValue: boolean | string | null): 'readonly' | 'writable' | 'off' {
+function normalizeConfigGlobal(configuredValue: boolean | string | null): "readonly" | "writable" | "off" {
     switch (configuredValue) {
-        case 'off':
-            return 'off';
+        case "off":
+            return "off";
 
         case true:
-        case 'true':
-        case 'writeable':
-        case 'writable':
-            return 'writable';
+        case "true":
+        case "writeable":
+        case "writable":
+            return "writable";
 
         case null:
         case false:
-        case 'false':
-        case 'readable':
-        case 'readonly':
-            return 'readonly';
+        case "false":
+        case "readable":
+        case "readonly":
+            return "readonly";
 
         default:
-            throw new Error(
-                `'${configuredValue}' is not a valid configuration for a global (use 'readonly', 'writable', or 'off')`
-            );
+            throw new Error(`'${configuredValue}' is not a valid configuration for a global (use 'readonly', 'writable', or 'off')`);
     }
 }
 
-export {
-    getRuleSeverity,
-    normalizeToStrings,
-    isErrorSeverity,
-    isValidSeverity,
-    isEverySeverityValid,
-    normalizeConfigGlobal
-};
+export { getRuleSeverity, normalizeToStrings, isErrorSeverity, isValidSeverity, isEverySeverityValid, normalizeConfigGlobal };

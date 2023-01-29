@@ -32,13 +32,13 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import assert from 'assert';
-import path from 'path';
+import assert from "assert";
+import path from "path";
 
-import Debug from 'debug';
-import ignore from 'ignore';
+import Debug from "debug";
+import ignore from "ignore";
 
-const debug = Debug('eslintrc:ignore-pattern');
+const debug = Debug("eslintrc:ignore-pattern");
 
 /** @typedef {ReturnType<import("ignore").default>} Ignore */
 
@@ -76,7 +76,7 @@ function getCommonAncestorPath(sourcePaths: string[]) {
     let resolvedResult = result || path.sep;
 
     // if Windows common ancestor is root of drive must have trailing slash to be absolute.
-    if (resolvedResult && resolvedResult.endsWith(':') && process.platform === 'win32') {
+    if (resolvedResult && resolvedResult.endsWith(":") && process.platform === "win32") {
         resolvedResult += path.sep;
     }
     return resolvedResult;
@@ -91,10 +91,10 @@ function getCommonAncestorPath(sourcePaths: string[]) {
 function relative(from: string, to: string) {
     const relPath = path.relative(from, to);
 
-    if (path.sep === '/') {
+    if (path.sep === "/") {
         return relPath;
     }
-    return relPath.split(path.sep).join('/');
+    return relPath.split(path.sep).join("/");
 }
 
 /**
@@ -103,13 +103,13 @@ function relative(from: string, to: string) {
  * @returns {string} The trailing slash if existed.
  */
 function dirSuffix(filePath: string) {
-    const isDir = filePath.endsWith(path.sep) || (process.platform === 'win32' && filePath.endsWith('/'));
+    const isDir = filePath.endsWith(path.sep) || (process.platform === "win32" && filePath.endsWith("/"));
 
-    return isDir ? '/' : '';
+    return isDir ? "/" : "";
 }
 
-const DefaultPatterns = Object.freeze(['/**/node_modules/*']);
-const DotPatterns = Object.freeze(['.*', '!.eslintrc.*', '!../']);
+const DefaultPatterns = Object.freeze(["/**/node_modules/*"]);
+const DotPatterns = Object.freeze([".*", "!.eslintrc.*", "!../"]);
 
 //------------------------------------------------------------------------------
 // Public
@@ -153,16 +153,16 @@ class IgnorePattern {
      * If the predicate function returned `true`, it means the path should be ignored.
      */
     static createIgnore(ignorePatterns: IgnorePattern[]): IgnorePredicate {
-        debug('Create with: %o', ignorePatterns);
+        debug("Create with: %o", ignorePatterns);
 
-        const basePath = getCommonAncestorPath(ignorePatterns.map((p) => p.basePath));
-        const patterns = ignorePatterns.map((p) => p.getPatternsRelativeTo(basePath)).flat();
+        const basePath = getCommonAncestorPath(ignorePatterns.map(p => p.basePath));
+        const patterns = ignorePatterns.map(p => p.getPatternsRelativeTo(basePath)).flat();
         // @ts-ignore
         const ig = ignore({ allowRelativePaths: true }).add([...DotPatterns, ...patterns]);
         // @ts-ignore
         const dotIg = ignore({ allowRelativePaths: true }).add(patterns);
 
-        debug('  processed: %o', { basePath, patterns });
+        debug("  processed: %o", { basePath, patterns });
 
         return Object.assign<(filePath: string, dot?: boolean) => boolean, { basePath: string; patterns: string[] }>(
             (filePath: string, dot = false) => {
@@ -170,9 +170,9 @@ class IgnorePattern {
                 const relPathRaw = relative(basePath, filePath);
                 const relPath = relPathRaw && relPathRaw + dirSuffix(filePath);
                 const adoptedIg = dot ? dotIg : ig;
-                const result = relPath !== '' && adoptedIg.ignores(relPath);
+                const result = relPath !== "" && adoptedIg.ignores(relPath);
 
-                debug('Check', { filePath, dot, relativePath: relPath, result });
+                debug("Check", { filePath, dot, relativePath: relPath, result });
                 return result;
             },
             { basePath, patterns }
@@ -225,12 +225,12 @@ class IgnorePattern {
         }
         const prefix = `/${relative(newBasePath, basePath)}`;
 
-        return patterns.map((pattern) => {
-            const negative = pattern.startsWith('!');
-            const head = negative ? '!' : '';
+        return patterns.map(pattern => {
+            const negative = pattern.startsWith("!");
+            const head = negative ? "!" : "";
             const body = negative ? pattern.slice(1) : pattern;
 
-            if (body.startsWith('/') || body.startsWith('../')) {
+            if (body.startsWith("/") || body.startsWith("../")) {
                 return `${head}${prefix}${body}`;
             }
             return loose ? pattern : `${head}${prefix}/**/${body}`;

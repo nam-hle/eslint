@@ -15,17 +15,9 @@
  * @author Toru Nagashima <https://github.com/mysticatea>
  */
 
-import {
-    EnvsMap,
-    GlobalsMap,
-    ParserOptions,
-    ResolvedParser,
-    ResolvedPluginsMap,
-    Settings,
-    SeverityConf
-} from '../shared/types.js';
+import { EnvsMap, GlobalsMap, ParserOptions, ResolvedParser, ResolvedPluginsMap, Settings, SeverityConf } from "@eslint/types";
 
-import { IgnorePattern, IgnorePredicate } from './ignore-pattern.js';
+import { IgnorePattern, IgnorePredicate } from "./ignore-pattern.js";
 
 // For VSCode intellisense
 /** @typedef {import("../../shared/types").ConfigData} ConfigData */
@@ -66,7 +58,7 @@ class ExtractedConfig {
          * The config name what `noInlineConfig` setting came from.
          * @type {string}
          */
-        this.configNameOfNoInlineConfig = '';
+        this.configNameOfNoInlineConfig = "";
 
         /**
          * Environments.

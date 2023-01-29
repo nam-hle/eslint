@@ -38,39 +38,31 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import fs from 'fs';
-import { createRequire } from 'module';
-import path from 'path';
+import fs from "fs";
+import { createRequire } from "module";
+import path from "path";
 
-import debugOrig from 'debug';
-import importFresh from 'import-fresh';
-import stripComments from 'strip-json-comments';
+import { ConfigData, OverrideConfigData, Plugin, Rule } from "@eslint/types";
+import debugOrig from "debug";
+import importFresh from "import-fresh";
+import stripComments from "strip-json-comments";
 
-import { ConfigArray, ConfigDependency, IgnorePattern, OverrideTester } from './config-array/index.js';
-import { assert } from './shared/assert.js';
-import ConfigValidator from './shared/config-validator.js';
-import * as naming from './shared/naming.js';
-import * as DefaultModuleResolver from './shared/relative-module-resolver.js';
-import type { ModuleResolver } from './shared/relative-module-resolver.js';
-import { ConfigData, OverrideConfigData, Plugin, Rule } from './shared/types.js';
+import { ConfigArray, ConfigDependency, IgnorePattern, OverrideTester } from "./config-array/index.js";
+import { assert } from "./shared/assert.js";
+import ConfigValidator from "./shared/config-validator.js";
+import * as naming from "./shared/naming.js";
+import * as DefaultModuleResolver from "./shared/relative-module-resolver.js";
+import type { ModuleResolver } from "./shared/relative-module-resolver.js";
 
 const require = createRequire(import.meta.url);
 
-const debug = debugOrig('eslintrc:config-array-factory');
+const debug = debugOrig("eslintrc:config-array-factory");
 
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
 
-const configFilenames = [
-    '.eslintrc.js',
-    '.eslintrc.cjs',
-    '.eslintrc.yaml',
-    '.eslintrc.yml',
-    '.eslintrc.json',
-    '.eslintrc',
-    'package.json'
-];
+const configFilenames = [".eslintrc.js", ".eslintrc.cjs", ".eslintrc.yaml", ".eslintrc.yml", ".eslintrc.json", ".eslintrc", "package.json"];
 
 // Define types for VSCode IntelliSense.
 /** @typedef {import("./shared/types").ConfigData} ConfigData */
@@ -148,7 +140,7 @@ interface ConfigArrayFactoryLoadingContext {
     matchBasePath: string;
     name: string;
     pluginBasePath: string;
-    type: 'config' | 'ignore' | 'implicit-processor';
+    type: "config" | "ignore" | "implicit-processor";
 }
 
 /**
@@ -181,7 +173,7 @@ function isFilePath(nameOrPath: string) {
  * @private
  */
 function readFile(filePath: string) {
-    return fs.readFileSync(filePath, 'utf8').replace(/^\ufeff/u, '');
+    return fs.readFileSync(filePath, "utf8").replace(/^\ufeff/u, "");
 }
 
 /**
@@ -195,7 +187,7 @@ function loadYAMLConfigFile(filePath: string) {
     debug(`Loading YAML config file: ${filePath}`);
 
     // lazy load YAML to improve performance when not used
-    const yaml = require('js-yaml');
+    const yaml = require("js-yaml");
 
     try {
         // empty YAML file can be null, so always use
@@ -222,7 +214,7 @@ function loadJSONConfigFile(filePath: string): ConfigData {
     } catch (e: any) {
         debug(`Error reading JSON file: ${filePath}`);
         e.message = `Cannot read config file: ${filePath}\nError: ${e.message}`;
-        e.messageTemplate = 'failed-to-read-json';
+        e.messageTemplate = "failed-to-read-json";
         e.messageData = {
             path: filePath,
             message: e.message
@@ -242,12 +234,12 @@ function loadLegacyConfigFile(filePath: string): ConfigData {
     debug(`Loading legacy config file: ${filePath}`);
 
     // lazy load YAML to improve performance when not used
-    const yaml = require('js-yaml');
+    const yaml = require("js-yaml");
 
     try {
         return yaml.load(stripComments(readFile(filePath))) || /* istanbul ignore next */ {};
     } catch (e: any) {
-        debug('Error reading YAML file: %s\n%o', filePath, e);
+        debug("Error reading YAML file: %s\n%o", filePath, e);
         e.message = `Cannot read config file: ${filePath}\nError: ${e.message}`;
         throw e;
     }
@@ -283,13 +275,13 @@ function loadPackageJSONConfigFile(filePath: string): ConfigData {
     try {
         const packageData = loadJSONConfigFile(filePath);
 
-        if (!Object.hasOwnProperty.call(packageData, 'eslintConfig')) {
+        if (!Object.hasOwnProperty.call(packageData, "eslintConfig")) {
             throw Object.assign(new Error("package.json file doesn't have 'eslintConfig' field."), {
-                code: 'ESLINT_CONFIG_FIELD_NOT_FOUND'
+                code: "ESLINT_CONFIG_FIELD_NOT_FOUND"
             });
         }
 
-        assert('eslintConfig' in packageData);
+        assert("eslintConfig" in packageData);
         return packageData.eslintConfig as ConfigData;
     } catch (e: any) {
         debug(`Error reading package.json file: ${filePath}`);
@@ -310,7 +302,7 @@ function loadESLintIgnoreFile(filePath: string) {
     try {
         return readFile(filePath)
             .split(/\r?\n/gu)
-            .filter((line) => line.trim() !== '' && !line.startsWith('#'));
+            .filter(line => line.trim() !== "" && !line.startsWith("#"));
     } catch (e: any) {
         debug(`Error reading .eslintignore file: ${filePath}`);
         e.message = `Cannot read .eslintignore file: ${filePath}\nError: ${e.message}`;
@@ -342,18 +334,18 @@ function configInvalidError(configName: string, importerName: string, messageTem
  */
 function loadConfigFile(filePath: string): ConfigData | null {
     switch (path.extname(filePath)) {
-        case '.js':
-        case '.cjs':
+        case ".js":
+        case ".cjs":
             return loadJSConfigFile(filePath);
 
-        case '.json':
-            if (path.basename(filePath) === 'package.json') {
+        case ".json":
+            if (path.basename(filePath) === "package.json") {
                 return loadPackageJSONConfigFile(filePath);
             }
             return loadJSONConfigFile(filePath);
 
-        case '.yaml':
-        case '.yml':
+        case ".yaml":
+        case ".yml":
             return loadYAMLConfigFile(filePath);
 
         default:
@@ -375,15 +367,15 @@ function writeDebugLogForLoading(request: string, relativeTo: string, filePath: 
 
         try {
             const packageJsonPath = DefaultModuleResolver.resolve(`${request}/package.json`, relativeTo);
-            const { version = 'unknown' } = require(packageJsonPath);
+            const { version = "unknown" } = require(packageJsonPath);
 
             nameAndVersion = `${request}@${version}`;
         } catch (error: any) {
-            debug('package.json was not found:', error.message);
+            debug("package.json was not found:", error.message);
             nameAndVersion = request;
         }
 
-        debug('Loaded: %s (%s)', nameAndVersion, filePath);
+        debug("Loaded: %s (%s)", nameAndVersion, filePath);
     }
 }
 
@@ -398,19 +390,17 @@ function writeDebugLogForLoading(request: string, relativeTo: string, filePath: 
  */
 function createContext(
     { cwd, resolvePluginsRelativeTo }: ConfigArrayFactoryInternalSlots,
-    providedType: 'config' | 'ignore' | 'implicit-processor' | undefined,
+    providedType: "config" | "ignore" | "implicit-processor" | undefined,
     providedName: string | undefined,
     providedFilePath: string | undefined,
     providedMatchBasePath: string | undefined
 ) {
-    const filePath = providedFilePath ? path.resolve(cwd, providedFilePath) : '';
+    const filePath = providedFilePath ? path.resolve(cwd, providedFilePath) : "";
     const matchBasePath =
-        (providedMatchBasePath && path.resolve(cwd, providedMatchBasePath)) ||
-        (filePath && path.dirname(filePath)) ||
-        cwd;
-    const name = providedName || (filePath && path.relative(cwd, filePath)) || '';
+        (providedMatchBasePath && path.resolve(cwd, providedMatchBasePath)) || (filePath && path.dirname(filePath)) || cwd;
+    const name = providedName || (filePath && path.relative(cwd, filePath)) || "";
     const pluginBasePath = resolvePluginsRelativeTo || (filePath && path.dirname(filePath)) || cwd;
-    const type = providedType || 'config';
+    const type = providedType || "config";
 
     return { filePath, matchBasePath, name, pluginBasePath, type };
 }
@@ -499,7 +489,7 @@ class ConfigArrayFactory {
         const slots = internalSlotsMap.get(this);
         assert(!!slots);
 
-        const ctx = createContext(slots, 'config', name, filePath, basePath);
+        const ctx = createContext(slots, "config", name, filePath, basePath);
         const elements = this._normalizeConfigData(configData, ctx);
 
         return new ConfigArray(...elements);
@@ -518,7 +508,7 @@ class ConfigArrayFactory {
         const slots = internalSlotsMap.get(this);
         assert(!!slots);
 
-        const ctx = createContext(slots, 'config', name, filePath, basePath);
+        const ctx = createContext(slots, "config", name, filePath, basePath);
 
         return new ConfigArray(...this._loadConfigData(ctx));
     }
@@ -537,7 +527,7 @@ class ConfigArrayFactory {
         assert(!!slots);
 
         for (const filename of configFilenames) {
-            const ctx = createContext(slots, 'config', name, path.join(directoryPath, filename), basePath);
+            const ctx = createContext(slots, "config", name, path.join(directoryPath, filename), basePath);
 
             if (fs.existsSync(ctx.filePath) && fs.statSync(ctx.filePath).isFile()) {
                 let configData;
@@ -545,7 +535,7 @@ class ConfigArrayFactory {
                 try {
                     configData = loadConfigFile(ctx.filePath);
                 } catch (error: any) {
-                    if (!error || error.code !== 'ESLINT_CONFIG_FIELD_NOT_FOUND') {
+                    if (!error || error.code !== "ESLINT_CONFIG_FIELD_NOT_FOUND") {
                         throw error;
                     }
                 }
@@ -571,7 +561,7 @@ class ConfigArrayFactory {
             const filePath = path.join(directoryPath, filename);
 
             if (fs.existsSync(filePath)) {
-                if (filename === 'package.json') {
+                if (filename === "package.json") {
                     try {
                         loadPackageJSONConfigFile(filePath);
                         return filePath;
@@ -595,7 +585,7 @@ class ConfigArrayFactory {
         const slots = internalSlotsMap.get(this);
         assert(!!slots);
 
-        const ctx = createContext(slots, 'ignore', void 0, filePath, slots.cwd);
+        const ctx = createContext(slots, "ignore", void 0, filePath, slots.cwd);
         const ignorePatterns = loadESLintIgnoreFile(ctx.filePath);
 
         return new ConfigArray(...this._normalizeESLintIgnoreData(ignorePatterns, ctx));
@@ -609,8 +599,8 @@ class ConfigArrayFactory {
         const slots = internalSlotsMap.get(this);
         assert(!!slots);
 
-        const eslintIgnorePath = path.resolve(slots.cwd, '.eslintignore');
-        const packageJsonPath = path.resolve(slots.cwd, 'package.json');
+        const eslintIgnorePath = path.resolve(slots.cwd, ".eslintignore");
+        const packageJsonPath = path.resolve(slots.cwd, "package.json");
 
         if (fs.existsSync(eslintIgnorePath)) {
             return this.loadESLintIgnore(eslintIgnorePath);
@@ -618,11 +608,11 @@ class ConfigArrayFactory {
         if (fs.existsSync(packageJsonPath)) {
             const data = loadJSONConfigFile(packageJsonPath);
 
-            if (Object.hasOwnProperty.call(data, 'eslintIgnore')) {
+            if (Object.hasOwnProperty.call(data, "eslintIgnore")) {
                 if (!Array.isArray(data.eslintIgnore)) {
-                    throw new Error('Package.json eslintIgnore property requires an array of paths');
+                    throw new Error("Package.json eslintIgnore property requires an array of paths");
                 }
-                const ctx = createContext(slots, 'ignore', 'eslintIgnore in package.json', packageJsonPath, slots.cwd);
+                const ctx = createContext(slots, "ignore", "eslintIgnore in package.json", packageJsonPath, slots.cwd);
 
                 return new ConfigArray(...this._normalizeESLintIgnoreData(data.eslintIgnore, ctx));
             }
@@ -651,10 +641,7 @@ class ConfigArrayFactory {
      * @returns {IterableIterator<ConfigArrayElement>} The normalized config.
      * @private
      */
-    *_normalizeESLintIgnoreData(
-        ignorePatterns: string[],
-        ctx: ConfigArrayFactoryLoadingContext
-    ): IterableIterator<ConfigArrayElement> {
+    *_normalizeESLintIgnoreData(ignorePatterns: string[], ctx: ConfigArrayFactoryLoadingContext): IterableIterator<ConfigArrayElement> {
         const elements = this._normalizeObjectConfigData({ ignorePatterns }, ctx);
 
         // Set `ignorePattern.loose` flag for backward compatibility.
@@ -673,10 +660,7 @@ class ConfigArrayFactory {
      * @returns {IterableIterator<ConfigArrayElement>} The normalized config.
      * @private
      */
-    _normalizeConfigData(
-        configData: ConfigData,
-        ctx: ConfigArrayFactoryLoadingContext
-    ): IterableIterator<ConfigArrayElement> {
+    _normalizeConfigData(configData: ConfigData, ctx: ConfigArrayFactoryLoadingContext): IterableIterator<ConfigArrayElement> {
         const validator = new ConfigValidator();
 
         validator.validateConfigSchema(configData, ctx.name || ctx.filePath);
@@ -726,10 +710,7 @@ class ConfigArrayFactory {
      * @returns {IterableIterator<ConfigArrayElement>} The normalized config.
      * @private
      */
-    *_normalizeObjectConfigDataBody(
-        configData: ConfigData,
-        ctx: ConfigArrayFactoryLoadingContext
-    ): IterableIterator<ConfigArrayElement> {
+    *_normalizeObjectConfigDataBody(configData: ConfigData, ctx: ConfigArrayFactoryLoadingContext): IterableIterator<ConfigArrayElement> {
         const {
             env,
             extends: extend,
@@ -807,12 +788,12 @@ class ConfigArrayFactory {
      * @private
      */
     _loadExtends(extendName: string, ctx: ConfigArrayFactoryLoadingContext) {
-        debug('Loading {extends:%j} relative to %s', extendName, ctx.filePath);
+        debug("Loading {extends:%j} relative to %s", extendName, ctx.filePath);
         try {
-            if (extendName.startsWith('eslint:')) {
+            if (extendName.startsWith("eslint:")) {
                 return this._loadExtendedBuiltInConfig(extendName, ctx);
             }
-            if (extendName.startsWith('plugin:')) {
+            if (extendName.startsWith("plugin:")) {
                 return this._loadExtendedPluginConfig(extendName, ctx);
             }
             return this._loadExtendedShareableConfig(extendName, ctx);
@@ -834,26 +815,19 @@ class ConfigArrayFactory {
         if (!slots) {
             throw new Error(`Internal slots map is not defined `);
         }
-        const {
-            eslintAllPath = '',
-            getEslintAllConfig,
-            eslintRecommendedPath = '',
-            getEslintRecommendedConfig
-        } = slots;
+        const { eslintAllPath = "", getEslintAllConfig, eslintRecommendedPath = "", getEslintRecommendedConfig } = slots;
 
-        if (extendName === 'eslint:recommended') {
+        if (extendName === "eslint:recommended") {
             const name = `${ctx.name} » ${extendName}`;
 
             if (getEslintRecommendedConfig) {
-                if (typeof getEslintRecommendedConfig !== 'function') {
-                    throw new Error(
-                        `getEslintRecommendedConfig must be a function instead of '${getEslintRecommendedConfig}'`
-                    );
+                if (typeof getEslintRecommendedConfig !== "function") {
+                    throw new Error(`getEslintRecommendedConfig must be a function instead of '${getEslintRecommendedConfig}'`);
                 }
                 return this._normalizeConfigData(getEslintRecommendedConfig(), {
                     ...ctx,
                     name,
-                    filePath: ''
+                    filePath: ""
                 });
             }
             return this._loadConfigData({
@@ -862,17 +836,17 @@ class ConfigArrayFactory {
                 filePath: eslintRecommendedPath
             });
         }
-        if (extendName === 'eslint:all') {
+        if (extendName === "eslint:all") {
             const name = `${ctx.name} » ${extendName}`;
 
             if (getEslintAllConfig) {
-                if (typeof getEslintAllConfig !== 'function') {
+                if (typeof getEslintAllConfig !== "function") {
                     throw new Error(`getEslintAllConfig must be a function instead of '${getEslintAllConfig}'`);
                 }
                 return this._normalizeConfigData(getEslintAllConfig(), {
                     ...ctx,
                     name,
-                    filePath: ''
+                    filePath: ""
                 });
             }
             return this._loadConfigData({
@@ -882,7 +856,7 @@ class ConfigArrayFactory {
             });
         }
 
-        throw configInvalidError(extendName, ctx.name, 'extend-config-missing');
+        throw configInvalidError(extendName, ctx.name, "extend-config-missing");
     }
 
     /**
@@ -893,13 +867,13 @@ class ConfigArrayFactory {
      * @private
      */
     _loadExtendedPluginConfig(extendName: string, ctx: ConfigArrayFactoryLoadingContext) {
-        const slashIndex = extendName.lastIndexOf('/');
+        const slashIndex = extendName.lastIndexOf("/");
 
         if (slashIndex === -1) {
-            throw configInvalidError(extendName, ctx.filePath, 'plugin-invalid');
+            throw configInvalidError(extendName, ctx.filePath, "plugin-invalid");
         }
 
-        const pluginName = extendName.slice('plugin:'.length, slashIndex);
+        const pluginName = extendName.slice("plugin:".length, slashIndex);
         const configName = extendName.slice(slashIndex + 1);
 
         if (isFilePath(pluginName)) {
@@ -917,7 +891,7 @@ class ConfigArrayFactory {
             });
         }
 
-        throw plugin.error || configInvalidError(extendName, ctx.filePath, 'extend-config-missing');
+        throw plugin.error || configInvalidError(extendName, ctx.filePath, "extend-config-missing");
     }
 
     /**
@@ -932,15 +906,15 @@ class ConfigArrayFactory {
         assert(!!slots);
 
         const { cwd, resolver } = slots;
-        const relativeTo = ctx.filePath || path.join(cwd, '__placeholder__.js');
+        const relativeTo = ctx.filePath || path.join(cwd, "__placeholder__.js");
         let request;
 
         if (isFilePath(extendName)) {
             request = extendName;
-        } else if (extendName.startsWith('.')) {
+        } else if (extendName.startsWith(".")) {
             request = `./${extendName}`; // For backward compatibility. A ton of tests depended on this behavior.
         } else {
-            request = naming.normalizePackageName(extendName, 'eslint-config');
+            request = naming.normalizePackageName(extendName, "eslint-config");
         }
 
         let filePath;
@@ -949,8 +923,8 @@ class ConfigArrayFactory {
             filePath = resolver.resolve(request, relativeTo);
         } catch (error: any) {
             /* istanbul ignore else */
-            if (error && error.code === 'MODULE_NOT_FOUND') {
-                throw configInvalidError(extendName, ctx.filePath, 'extend-config-missing');
+            if (error && error.code === "MODULE_NOT_FOUND") {
+                throw configInvalidError(extendName, ctx.filePath, "extend-config-missing");
             }
             throw error;
         }
@@ -973,7 +947,7 @@ class ConfigArrayFactory {
     _loadPlugins(names: string[], ctx: ConfigArrayFactoryLoadingContext) {
         return names.reduce<Record<string, ConfigDependency>>((map, name) => {
             if (isFilePath(name)) {
-                throw new Error('Plugins array cannot includes file paths.');
+                throw new Error("Plugins array cannot includes file paths.");
             }
             const plugin = this._loadPlugin(name, ctx);
 
@@ -990,13 +964,13 @@ class ConfigArrayFactory {
      * @returns {DependentParser} The loaded parser.
      */
     _loadParser(nameOrPath: string, ctx: ConfigArrayFactoryLoadingContext) {
-        debug('Loading parser %j from %s', nameOrPath, ctx.filePath);
+        debug("Loading parser %j from %s", nameOrPath, ctx.filePath);
 
         const slots = internalSlotsMap.get(this);
         assert(!!slots);
 
         const { cwd, resolver } = slots;
-        const relativeTo = ctx.filePath || path.join(cwd, '__placeholder__.js');
+        const relativeTo = ctx.filePath || path.join(cwd, "__placeholder__.js");
 
         try {
             const filePath = resolver.resolve(nameOrPath, relativeTo);
@@ -1012,11 +986,11 @@ class ConfigArrayFactory {
             });
         } catch (error: any) {
             // If the parser name is "espree", load the espree of ESLint.
-            if (nameOrPath === 'espree') {
-                debug('Fallback espree.');
+            if (nameOrPath === "espree") {
+                debug("Fallback espree.");
                 return new ConfigDependency({
-                    definition: require('espree'),
-                    filePath: require.resolve('espree'),
+                    definition: require("espree"),
+                    filePath: require.resolve("espree"),
                     id: nameOrPath,
                     importerName: ctx.name,
                     importerPath: ctx.filePath
@@ -1043,19 +1017,19 @@ class ConfigArrayFactory {
      * @private
      */
     _loadPlugin(name: string, ctx: ConfigArrayFactoryLoadingContext): ConfigDependency {
-        debug('Loading plugin %j from %s', name, ctx.filePath);
+        debug("Loading plugin %j from %s", name, ctx.filePath);
 
         const slots = internalSlotsMap.get(this);
         assert(!!slots);
 
         const { additionalPluginPool, resolver } = slots;
-        const request = naming.normalizePackageName(name, 'eslint-plugin');
-        const id = naming.getShorthandName(request, 'eslint-plugin');
-        const relativeTo = path.join(ctx.pluginBasePath, '__placeholder__.js');
+        const request = naming.normalizePackageName(name, "eslint-plugin");
+        const id = naming.getShorthandName(request, "eslint-plugin");
+        const relativeTo = path.join(ctx.pluginBasePath, "__placeholder__.js");
 
         if (name.match(/\s+/u)) {
             const error = Object.assign(new Error(`Whitespace found in plugin name '${name}'`), {
-                messageTemplate: 'whitespace-found',
+                messageTemplate: "whitespace-found",
                 messageData: { pluginName: request }
             });
 
@@ -1073,7 +1047,7 @@ class ConfigArrayFactory {
         if (plugin) {
             return new ConfigDependency({
                 definition: normalizePlugin(plugin),
-                filePath: '', // It's unknown where the plugin came from.
+                filePath: "", // It's unknown where the plugin came from.
                 id,
                 importerName: ctx.name,
                 importerPath: ctx.filePath
@@ -1088,8 +1062,8 @@ class ConfigArrayFactory {
         } catch (resolveError: any) {
             error = resolveError;
             /* istanbul ignore else */
-            if (error && error.code === 'MODULE_NOT_FOUND') {
-                error.messageTemplate = 'plugin-missing';
+            if (error && error.code === "MODULE_NOT_FOUND") {
+                error.messageTemplate = "plugin-missing";
                 error.messageData = {
                     pluginName: request,
                     resolvePluginsRelativeTo: ctx.pluginBasePath,
@@ -1138,15 +1112,14 @@ class ConfigArrayFactory {
      */
     *_takeFileExtensionProcessors(plugins: Record<string, ConfigDependency>, ctx: ConfigArrayFactoryLoadingContext) {
         for (const pluginId of Object.keys(plugins)) {
-            const processors =
-                plugins[pluginId] && plugins[pluginId].definition && plugins[pluginId].definition.processors;
+            const processors = plugins[pluginId] && plugins[pluginId].definition && plugins[pluginId].definition.processors;
 
             if (!processors) {
                 continue;
             }
 
             for (const processorId of Object.keys(processors)) {
-                if (processorId.startsWith('.')) {
+                if (processorId.startsWith(".")) {
                     yield* this._normalizeObjectConfigData(
                         {
                             files: [`*${processorId}`],
@@ -1154,7 +1127,7 @@ class ConfigArrayFactory {
                         },
                         {
                             ...ctx,
-                            type: 'implicit-processor',
+                            type: "implicit-processor",
                             name: `${ctx.name}#processors["${pluginId}/${processorId}"]`
                         }
                     );
