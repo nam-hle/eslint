@@ -298,7 +298,6 @@ async function shouldUseFlatConfig(allowFlatConfig?: boolean) {
         return false;
     }
 
-    console.log("process", process.env.ESLINT_USE_FLAT_CONFIG);
     switch (process.env.ESLINT_USE_FLAT_CONFIG) {
         case "true":
             return true;
@@ -309,7 +308,6 @@ async function shouldUseFlatConfig(allowFlatConfig?: boolean) {
              * If neither explicitly enabled nor disabled, then use the presence
              * of a flat config file to determine enablement.
              */
-            console.log("@@@", await findFlatConfigFile(process.cwd()));
             return !!(await findFlatConfigFile(process.cwd()));
     }
 }
@@ -331,7 +329,6 @@ const cli = {
      * @returns {Promise<number>} The exit code for the operation.
      */
     async execute(args: string | any[] | Record<string, any>, text?: string, allowFlatConfig?: boolean): Promise<number> {
-        console.log({ args, text, allowFlatConfig });
         if (Array.isArray(args)) {
             debug("CLI args: %o", args.slice(2));
         }
@@ -356,8 +353,6 @@ const cli = {
             // @ts-expect-error
             options = CLIOptions.parse(args);
         } catch (error: any) {
-            console.log("357");
-            console.log(error);
             debug("Error parsing CLI options:", error.message);
             log.error(error.message);
             return 2;
@@ -421,7 +416,6 @@ const cli = {
             log.error("The --fix-type option requires either --fix or --fix-dry-run.");
             return 2;
         }
-        console.log("424");
 
         const ActiveESLint = usingFlatConfig ? FlatESLint : ESLint;
 
@@ -453,8 +447,6 @@ const cli = {
             // @ts-expect-error
             resultsToPrint = ActiveESLint.getErrorResults(resultsToPrint);
         }
-
-        console.log("456");
 
         // @ts-expect-error
         const resultCounts = countErrors(results);

@@ -343,7 +343,6 @@ async function loadFlatConfigFile(filePath: string) {
         delete require.cache[filePath];
     }
 
-    console.log(fileURL);
     const config = (await import(fileURL as unknown as string)).default;
 
     importedConfigFileModificationTime.set(filePath, mtime);
@@ -1036,7 +1035,6 @@ class FlatESLint {
             // Initialize it lazily because CLI and `ESLint` API don't use it.
             get usedDeprecatedRules() {
                 if (!usedDeprecatedRules) {
-                    console.log({ config });
                     usedDeprecatedRules = Array.from(iterateRuleDeprecationWarnings(config));
                 }
                 return usedDeprecatedRules;

@@ -47,8 +47,6 @@ export = function (usingFlatConfig: boolean): ParsedCLIOptions {
         };
     }
 
-    console.log({ usingFlatConfig });
-
     let envFlag;
 
     if (!usingFlatConfig) {
