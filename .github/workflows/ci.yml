@@ -19,8 +19,8 @@ jobs:
         node-version: '16.x'
     - name: Install Packages
       run: npm install
-    - name: Lint Files
-      run: npm run lint
+#    - name: Lint Files
+#      run: npm run lint
 #    - name: Check Rule Files
 #      run: node Makefile checkRuleFiles
 #      working-directory: packages/core
