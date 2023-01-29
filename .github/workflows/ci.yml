@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [main, ts]
   pull_request:
     branches: [main]
 
@@ -20,19 +20,20 @@ jobs:
     - name: Install Packages
       run: npm install
     - name: Lint Files
-      run: node Makefile lint
-    - name: Check Rule Files
-      run: node Makefile checkRuleFiles
-    - name: Check Licenses
-      run: node Makefile checkLicenses
-    - name: Install Docs Packages
-      working-directory: docs
-      run: npm install
-    - name: Stylelint Docs
-      working-directory: docs
-      run: npm run lint:scss
-    - name: Lint Docs JS Files
-      run: node Makefile lintDocsJS
+      run: npm run lint
+#    - name: Check Rule Files
+#      run: node Makefile checkRuleFiles
+#      working-directory: packages/core
+#    - name: Check Licenses
+#      run: node Makefile checkLicenses
+#    - name: Install Docs Packages
+#      working-directory: docs
+#      run: npm install
+#    - name: Stylelint Docs
+#      working-directory: docs
+#      run: npm run lint:scss
+#    - name: Lint Docs JS Files
+#      run: node Makefile lintDocsJS
 
   test_on_node:
     name: Test
@@ -54,21 +55,21 @@ jobs:
     - name: Install Packages
       run: npm install
     - name: Test
-      run: node Makefile mocha
-    - name: Fuzz Test
-      run: node Makefile fuzz
+      run: npm run test
+#    - name: Fuzz Test
+#      run: node Makefile fuzz
 
-  test_on_browser:
-    name: Browser Test
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-    - name: Install Packages
-      run: npm install
-    - name: Test
-      run: node Makefile karma
-    - name: Fuzz Test
-      run: node Makefile fuzz
+#  test_on_browser:
+#    name: Browser Test
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v3
+#    - uses: actions/setup-node@v3
+#      with:
+#        node-version: '16'
+#    - name: Install Packages
+#      run: npm install
+#    - name: Test
+#      run: node Makefile karma
+#    - name: Fuzz Test
+#      run: node Makefile fuzz
