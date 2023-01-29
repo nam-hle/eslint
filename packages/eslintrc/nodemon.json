@@ -1,0 +1,11 @@
+{
+    "exec": "npm test",
+    "watch": [
+        "./dist/**/*",
+        "./bundle/**/*"
+    ],
+    "delay": 100,
+    "env": {
+        "NODE_ENV": "test"
+    }
+}
