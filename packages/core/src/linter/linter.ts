@@ -28,7 +28,10 @@ import {
     Processor,
     LintMessage,
     LanguageOptions,
-    Token
+    Token,
+    ASTNode,
+    SourceLocation,
+    type Scope as TypeScope
 } from "@eslint/types";
 import Debug from "debug";
 import { analyze, Scope, Variable } from "eslint-scope";
@@ -42,7 +45,6 @@ import ruleReplacements from "../conf/replacements.json";
 import { FlatConfigArray } from "../config/flat-config-array";
 import { getRuleFromConfig } from "../config/flat-config-helpers";
 import { FlatConfig } from "../config/flat-config-schema";
-import { ASTNode, SourceLocation } from "../estree";
 import { assert } from "../shared/assert";
 import { shebangPattern } from "../shared/ast-utils";
 import { directivesPattern } from "../shared/directives";
@@ -957,12 +959,11 @@ function parse(text: string, languageOptions: LanguageOptions, filePath: string)
  * @param {ASTNode} currentNode The node to get the scope of
  * @returns {eslint-scope.Scope} The scope information for this node
  */
-function getScope(scopeManager: ScopeManager, currentNode: ASTNode) {
+function getScope(scopeManager: ScopeManager, currentNode: ASTNode): TypeScope {
     // On Program node, get the outermost scope to avoid return Node.js special function scope or ES modules scope.
     const inner = currentNode.type !== "Program";
 
     for (let node = currentNode; node; node = node.parent) {
-        // @ts-expect-error
         const scope = scopeManager.acquire(node, inner);
 
         if (scope) {
@@ -973,7 +974,6 @@ function getScope(scopeManager: ScopeManager, currentNode: ASTNode) {
         }
     }
 
-    // @ts-expect-error
     return scopeManager.scopes[0];
 }
 
@@ -995,7 +995,7 @@ function markVariableAsUsed(scopeManager: ScopeManager, currentNode: ASTNode, la
     // Special Node.js scope means we need to start one level deeper
     const initialScope = currentScope.type === "global" && specialScope ? currentScope.childScopes[0] : currentScope;
 
-    for (let scope = initialScope; scope; scope = scope.upper) {
+    for (let scope: TypeScope | null = initialScope; scope; scope = scope.upper) {
         const variable = scope.variables.find((scopeVar: any) => scopeVar.name === name);
 
         if (variable) {

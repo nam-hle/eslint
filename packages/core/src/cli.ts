@@ -100,7 +100,7 @@ async function translateOptions(cliOptions: ParsedCLIOptions, configType: "flat"
         rule,
         rulesdir
     } = cliOptions;
-    let overrideConfig: any, overrideConfigFile;
+    let overrideConfig: any, overrideConfigFile: string | boolean | undefined;
     const importer = new ModuleImporter();
 
     if (configType === "flat") {
@@ -184,8 +184,7 @@ async function translateOptions(cliOptions: ParsedCLIOptions, configType: "flat"
         errorOnUnmatchedPattern,
         fix: (fix || fixDryRun) && (quiet ? quietFixPredicate : true),
         fixTypes: fixType,
-        // @ts-expect-error
-        ignore,
+        ignore: !!ignore,
         overrideConfig,
         // @ts-expect-error
         overrideConfigFile,
@@ -193,7 +192,6 @@ async function translateOptions(cliOptions: ParsedCLIOptions, configType: "flat"
     };
 
     if (configType === "flat") {
-        // @ts-expect-error
         options.ignorePatterns = ignorePattern;
     } else {
         options.resolvePluginsRelativeTo = resolvePluginsRelativeTo;
@@ -435,7 +433,6 @@ const cli = {
 
         if (options.fix) {
             debug("Fix mode enabled - applying fixes");
-            // @ts-expect-error
             await ActiveESLint.outputFixes(results);
         }
 
@@ -443,11 +440,9 @@ const cli = {
 
         if (options.quiet) {
             debug("Quiet mode enabled - filtering out warnings");
-            // @ts-expect-error
             resultsToPrint = ActiveESLint.getErrorResults(resultsToPrint);
         }
 
-        // @ts-expect-error
         const resultCounts = countErrors(results);
         const tooManyWarnings = options.maxWarnings >= 0 && resultCounts.warningCount > options.maxWarnings;
         const resultsMeta = tooManyWarnings

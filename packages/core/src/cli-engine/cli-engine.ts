@@ -29,7 +29,7 @@ import {
     ParserOptions,
     Plugin,
     RuleConf,
-    SuppressedLintMessage
+    LintResult
 } from "@eslint/types";
 import Debug from "debug";
 const debug = Debug("eslint:cli-engine");
@@ -100,7 +100,7 @@ export interface CLIEngineOptions {
     cache?: boolean;
     cacheLocation?: string;
     cacheFile?: string | null;
-    cacheStrategy: "metadata" | "content";
+    cacheStrategy?: "metadata" | "content";
     errorOnUnmatchedPattern?: boolean;
     configFile?: string | null;
     cwd?: string;
@@ -140,18 +140,18 @@ export interface CLIEngineOptions {
  * @property {string} [output] The source code of the file that was linted, with as many fixes applied as possible.
  */
 
-export interface LintResult {
-    filePath: string;
-    messages: LintMessage[];
-    suppressedMessages: SuppressedLintMessage[];
-    errorCount: number;
-    fatalErrorCount: number;
-    warningCount: number;
-    fixableErrorCount: number;
-    fixableWarningCount: number;
-    source?: string;
-    output?: string;
-}
+// export interface LintResult {
+//     filePath: string;
+//     messages: LintMessage[];
+//     suppressedMessages: SuppressedLintMessage[];
+//     errorCount: number;
+//     fatalErrorCount: number;
+//     warningCount: number;
+//     fixableErrorCount: number;
+//     fixableWarningCount: number;
+//     source?: string;
+//     output?: string;
+// }
 
 /**
  * Linting results.

@@ -8,9 +8,8 @@
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
+import { ASTNode } from "@eslint/types";
 import Debug from "debug";
-
-import { ASTNode } from "../../estree";
 
 import CodePath from "./code-path";
 import CodePathSegment from "./code-path-segment";

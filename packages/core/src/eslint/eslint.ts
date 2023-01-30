@@ -15,9 +15,9 @@ import path from "path";
 import { promisify } from "util";
 
 import { Legacy } from "@eslint/eslintrc";
-import { ResultsMeta, Rule, RuleMeta, ConfigData, Plugin } from "@eslint/types";
+import { ResultsMeta, Rule, RuleMeta, ConfigData, Plugin, LintResult } from "@eslint/types";
 
-import { CLIEngine, CLIEngineOptions, getCLIEngineInternalSlots, LintReport, LintResult } from "../cli-engine/cli-engine";
+import { CLIEngine, CLIEngineOptions, getCLIEngineInternalSlots, LintReport } from "../cli-engine/cli-engine";
 import BuiltinRules from "../rules";
 import { assert } from "../shared/assert";
 import { packageJson } from "../shared/package";
@@ -95,6 +95,7 @@ export interface ESLintOptions {
     resolvePluginsRelativeTo?: string;
     rulePaths?: string[];
     useEslintrc?: boolean;
+    ignorePatterns?: string[];
 }
 
 /**
@@ -104,11 +105,6 @@ export interface ESLintOptions {
  * @property {Object} definition The plugin definition.
  */
 
-export interface RulesMeta {
-    id: string;
-    definition: any;
-}
-
 /**
  * Private members for the `ESLint` instance.
  * @typedef {Object} ESLintPrivateMembers
@@ -116,7 +112,7 @@ export interface RulesMeta {
  * @property {ESLintOptions} options The options used to instantiate the ESLint instance.
  */
 
-export interface ESLintPrivateMembers {
+interface ESLintPrivateMembers {
     cliEngine: CLIEngine;
     options: CLIEngineOptions;
 }
@@ -173,9 +169,10 @@ function isFixTypeArray(x: any) {
  * The error for invalid options.
  */
 class ESLintInvalidOptionsError extends Error {
+    code: string;
+
     constructor(messages: string[]) {
         super(`Invalid Options:\n- ${messages.join("\n- ")}`);
-        // @ts-expect-error
         this.code = "ESLINT_INVALID_OPTIONS";
         Error.captureStackTrace(this, ESLintInvalidOptionsError);
     }
@@ -386,18 +383,15 @@ function getOrFindUsedDeprecatedRules(cliEngine: CLIEngine, maybeFilePath: strin
     const config = configArray.extractConfig(filePath);
 
     // Most files use the same config, so cache it.
-    // @ts-expect-error
-    if (!usedDeprecatedRulesCache.has(config)) {
+    if (config && !usedDeprecatedRulesCache.has(config)) {
         const pluginRules = configArray.pluginRules;
         const retv = [];
 
-        // @ts-expect-error
         for (const [ruleId, ruleConf] of Object.entries(config.rules)) {
             if (getRuleSeverity(ruleConf) === 0) {
                 continue;
             }
-            // @ts-expect-error
-            const rule = pluginRules.get(ruleId) || BuiltinRules.get(ruleId);
+            const rule = pluginRules?.get(ruleId) || BuiltinRules.get(ruleId);
             const meta = rule && rule.meta;
 
             if (meta && meta.deprecated) {
@@ -405,7 +399,6 @@ function getOrFindUsedDeprecatedRules(cliEngine: CLIEngine, maybeFilePath: strin
             }
         }
 
-        // @ts-expect-error
         usedDeprecatedRulesCache.set(config, Object.freeze(retv));
     }
 
@@ -421,18 +414,14 @@ function getOrFindUsedDeprecatedRules(cliEngine: CLIEngine, maybeFilePath: strin
  * @returns {LintResult[]} The processed linting results.
  */
 function processCLIEngineLintReport(cliEngine: CLIEngine, { results }: LintReport) {
-    const descriptor = {
-        configurable: true,
-        enumerable: true,
-        // @ts-expect-error
-        get() {
-            // @ts-expect-error
-            return getOrFindUsedDeprecatedRules(cliEngine, this.filePath);
-        }
-    };
-
     for (const result of results) {
-        Object.defineProperty(result, "usedDeprecatedRules", descriptor);
+        Object.defineProperty(result, "usedDeprecatedRules", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                return getOrFindUsedDeprecatedRules(cliEngine, this.filePath);
+            }
+        });
     }
 
     return results;
@@ -464,8 +453,7 @@ class ESLint {
      * Creates a new instance of the main ESLint API.
      * @param {ESLintOptions} options The options for this instance.
      */
-    // @ts-expect-error
-    constructor(options?: CLIEngineOptions = {}) {
+    constructor(options: CLIEngineOptions = {}) {
         const processedOptions = processOptions(options);
         // @ts-expect-error
         const cliEngine = new CLIEngine(processedOptions, { preloadedPlugins: options.plugins });

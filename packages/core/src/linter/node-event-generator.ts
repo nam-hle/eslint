@@ -5,10 +5,8 @@
 
 "use strict";
 
-import { SafeEmitter } from "@eslint/types";
+import { SafeEmitter, ASTNode, ESTree } from "@eslint/types";
 import esquery from "esquery";
-
-import { ASTNode, Node } from "../estree";
 
 //------------------------------------------------------------------------------
 // Requirements
@@ -264,7 +262,7 @@ function parseSelector(rawSelector: string): ASTSelector {
 class NodeEventGenerator {
     private emitter: SafeEmitter;
     private esqueryOptions: any;
-    currentAncestry: Node[];
+    currentAncestry: ESTree.Node[];
     private enterSelectorsByNodeType: Map<string, any>;
     private exitSelectorsByNodeType: Map<string, any>;
     private anyTypeEnterSelectors: any[];

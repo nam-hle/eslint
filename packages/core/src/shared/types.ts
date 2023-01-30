@@ -2,6 +2,7 @@ import { ASTNode, ParserOptions, ReportDescriptor, ScopeManager, Settings } from
 import { Variable } from "eslint-scope";
 
 import { SourceCode } from "../source-code";
+
 export interface RuleContext {
     parserOptions: ParserOptions;
     id: string;

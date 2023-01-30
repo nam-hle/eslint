@@ -11,9 +11,8 @@
 
 import assert from "assert";
 
-import { isPosition, MessageDescriptor } from "@eslint/types";
+import { isPosition, MessageDescriptor, ASTNode, Position } from "@eslint/types";
 
-import { ASTNode, Position } from "../estree";
 import SourceCode from "../source-code/source-code";
 
 import interpolate from "./interpolate";

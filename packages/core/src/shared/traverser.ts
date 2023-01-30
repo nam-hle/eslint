@@ -9,10 +9,9 @@
 // Requirements
 //------------------------------------------------------------------------------
 
+import { ASTNode } from "@eslint/types";
 import Debug from "debug";
 import { KEYS, getKeys as visitorGetKeys, VisitorKeys } from "eslint-visitor-keys";
-
-import { ASTNode } from "../estree";
 
 const debug = Debug("eslint:traverser");
 

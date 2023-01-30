@@ -10,13 +10,12 @@
 // Requirements
 //------------------------------------------------------------------------------
 
+import { ASTNode, Token, ESTree } from "@eslint/types";
 import escapeRegExp from "escape-string-regexp";
 import { latestEcmaVersion, tokenize } from "espree";
 import esutils from "esutils";
 
-import { BigIntLiteral, RegExpLiteral } from "../../estree";
 import SourceCode from "../../source-code/source-code";
-import { ASTNode, Comment, Token } from "../../source-code/token-store/cursor";
 
 const { breakableTypePattern, createGlobalLinebreakMatcher, lineBreakPattern, shebangPattern } = require("../../shared/ast-utils");
 
@@ -164,8 +163,9 @@ function isNullLiteral(node: ASTNode) {
      * `node.regex` instead. Also see: https://github.com/eslint/eslint/issues/8020
      */
 
-    // @ts-expect-error
-    return node.type === "Literal" && node.value === null && !RegExpLiteral.isInstance(node) && !BigIntLiteral.isInstance(node);
+    return (
+        node.type === "Literal" && node.value === null && !ESTree.RegExpLiteral.isInstance(node) && !ESTree.BigIntLiteral.isInstance(node)
+    );
 }
 
 /**
@@ -207,10 +207,10 @@ function getStaticStringValue(node: ASTNode) {
                 if (isNullLiteral(node)) {
                     return String(node.value); // "null"
                 }
-                if (RegExpLiteral.isInstance(node)) {
+                if (ESTree.RegExpLiteral.isInstance(node)) {
                     return `/${node.regex.pattern}/${node.regex.flags}`;
                 }
-                if (BigIntLiteral.isInstance(node)) {
+                if (ESTree.BigIntLiteral.isInstance(node)) {
                     return node.bigint;
                 }
 
@@ -365,12 +365,12 @@ function equalLiteralValue(left: ASTNode, right: ASTNode) {
         return false;
     }
     // RegExp literal.
-    if (RegExpLiteral.isInstance(left) && RegExpLiteral.isInstance(right)) {
+    if (ESTree.RegExpLiteral.isInstance(left) && ESTree.RegExpLiteral.isInstance(right)) {
         return Boolean(left.regex && right.regex && left.regex.pattern === right.regex.pattern && left.regex.flags === right.regex.flags);
     }
 
     // BigInt literal.
-    if (BigIntLiteral.isInstance(left) && BigIntLiteral.isInstance(right)) {
+    if (ESTree.BigIntLiteral.isInstance(left) && ESTree.BigIntLiteral.isInstance(right)) {
         return left.bigint === right.bigint;
     }
 

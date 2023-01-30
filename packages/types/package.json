@@ -28,7 +28,9 @@
         "url": "https://github.com/eslint/eslintrc/issues"
     },
     "homepage": "https://github.com/eslint/eslintrc#readme",
-    "devDependencies": {},
+    "devDependencies": {
+        "@types/json-schema": "^7.0.11"
+    },
     "dependencies": {},
     "engines": {
         "node": "^12.22.0 || ^14.17.0 || >=16.0.0"

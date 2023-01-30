@@ -69,7 +69,7 @@ const NODE = "node ", // intentional extra space
     ESLINT = `${NODE} bin/eslint.js --report-unused-disable-directives `,
     // Files
     RULE_FILES = glob.sync("lib/rules/*.js").filter(filePath => path.basename(filePath) !== "index.js"),
-    JSON_FILES = find("conf/").filter(fileType("json")),
+    JSON_FILES = find("lib/conf/").filter(fileType("json")),
     MARKDOWNLINT_IGNORE_INSTANCE = ignore().add(fs.readFileSync(path.join(__dirname, ".markdownlintignore"), "utf-8")),
     MARKDOWN_FILES_ARRAY = MARKDOWNLINT_IGNORE_INSTANCE.filter(find("docs/").concat(ls(".")).filter(fileType("md"))),
     TEST_FILES = '"tests/{bin,conf,lib,tools}/**/*.js"',
@@ -629,19 +629,19 @@ target.mocha = () => {
 target.karma = () => {
     echo("Running unit tests on browsers");
 
-    // target.webpack("production");
-    //
-    // const lastReturn = exec(`${getBinFile("karma")} start karma.conf.js`);
-    //
-    // if (lastReturn.code !== 0) {
-    //     exit(1);
-    // }
+    target.webpack("production");
+
+    const lastReturn = exec(`${getBinFile("karma")} start karma.conf.js`);
+
+    if (lastReturn.code !== 0) {
+        exit(1);
+    }
 };
 
 target.test = function () {
     target.checkRuleFiles();
     target.mocha();
-    target.karma();
+    // target.karma();
     target.fuzz({ amount: 150, fuzzBrokenAutofixes: false });
     target.checkLicenses();
 };
@@ -848,19 +848,19 @@ target.checkRuleFiles = function () {
             }
 
             // check eslint:recommended
-            const recommended = require("./conf/eslint-recommended");
+            const recommended = require("./lib/conf/eslint-recommended");
 
             if (ruleDef.meta.docs.recommended) {
                 if (recommended.rules[basename] !== "error") {
                     console.error(
-                        `Missing rule from eslint:recommended (./conf/eslint-recommended.js): ${basename}. If you just made a rule recommended then add an entry for it in this file.`
+                        `Missing rule from eslint:recommended (./lib/conf/eslint-recommended.js): ${basename}. If you just made a rule recommended then add an entry for it in this file.`
                     );
                     errors++;
                 }
             } else {
                 if (basename in recommended.rules) {
                     console.error(
-                        `Extra rule in eslint:recommended (./conf/eslint-recommended.js): ${basename}. If you just added a rule then don't add an entry for it in this file.`
+                        `Extra rule in eslint:recommended (./lib/conf/eslint-recommended.js): ${basename}. If you just added a rule then don't add an entry for it in this file.`
                     );
                     errors++;
                 }

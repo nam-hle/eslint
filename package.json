@@ -1,49 +1,51 @@
 {
-  "name": "root",
-  "private": true,
-  "version": "8.32.0",
-  "author": "Nicholas C. Zakas <nicholas+npm@nczconsulting.com>",
-  "description": "An AST-based pattern checker for JavaScript.",
-  "scripts": {
-    "test": "npm run test --ws --if-present",
-    "compile": "npm run compile:types && npm run compile:eslintrc && npm run compile:core",
-    "compile:types": "npm run compile --workspace=packages/types",
-    "compile:eslintrc": "npm run compile --workspace=packages/eslintrc",
-    "compile:core": "npm run compile --workspace=packages/core",
-    "start": "run-p start:*",
-    "start:core": "npm start --workspace=packages/core",
-    "start:eslintrc": "npm start --workspace=packages/eslintrc",
-    "lint": "eslint ./packages/*/src --ext .ts,.tsx --fix"
-  },
-  "repository": "eslint/eslint",
-  "funding": "https://opencollective.com/eslint",
-  "homepage": "https://eslint.org",
-  "bugs": "https://github.com/eslint/eslint/issues/",
-  "devDependencies": {
-    "eslint": "^8.12.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-eslint-comments": "^3.2.0",
-    "eslint-plugin-eslint-plugin": "^4.4.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-unicorn": "^42.0.0",
-    "eslint-plugin-unused-imports": "^2.0.0",
-    "npm-run-all": "^4.1.5",
-    "typescript": "4.9.4"
-  },
-  "keywords": [
-    "ast",
-    "lint",
-    "javascript",
-    "ecmascript",
-    "espree"
-  ],
-  "license": "MIT",
-  "engines": {
-    "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
-  },
-  "workspaces": [
-    "packages/*"
-  ]
+    "name": "root",
+    "private": true,
+    "version": "8.32.0",
+    "author": "Nicholas C. Zakas <nicholas+npm@nczconsulting.com>",
+    "description": "An AST-based pattern checker for JavaScript.",
+    "scripts": {
+        "test": "npm run test --ws --if-present",
+        "compile": "npm run compile:types && npm run compile:eslintrc && npm run compile:core",
+        "compile:types": "npm run compile --workspace=packages/types",
+        "compile:eslintrc": "npm run compile --workspace=packages/eslintrc",
+        "compile:core": "npm run compile --workspace=packages/core",
+        "start": "run-p start:*",
+        "start:core": "npm start --workspace=packages/core",
+        "start:eslintrc": "npm start --workspace=packages/eslintrc",
+        "lint": "eslint ./packages/*/src --ext .ts,.tsx --fix"
+    },
+    "repository": "eslint/eslint",
+    "funding": "https://opencollective.com/eslint",
+    "homepage": "https://eslint.org",
+    "bugs": "https://github.com/eslint/eslint/issues/",
+    "devDependencies": {
+        "eslint": "^8.12.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-eslint-comments": "^3.2.0",
+        "eslint-plugin-eslint-plugin": "^4.4.0",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "eslint-plugin-unicorn": "^42.0.0",
+        "eslint-plugin-unused-imports": "^2.0.0",
+        "@typescript-eslint/eslint-plugin": "^5.27.0",
+        "@typescript-eslint/parser": "^5.27.0",
+        "npm-run-all": "^4.1.5",
+        "typescript": "4.9.4"
+    },
+    "keywords": [
+        "ast",
+        "lint",
+        "javascript",
+        "ecmascript",
+        "espree"
+    ],
+    "license": "MIT",
+    "engines": {
+        "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
+    },
+    "workspaces": [
+        "packages/*"
+    ]
 }

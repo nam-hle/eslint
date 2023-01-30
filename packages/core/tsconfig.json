@@ -6,7 +6,7 @@
         "outDir": "lib",
         "module": "commonjs",
         "moduleResolution": "node",
-        "typeRoots": [ "./src/types", "./node_modules/@types"]
+        "typeRoots": [ "../../node_modules/@eslint/types/src/types", "./node_modules/@types"]
     },
     "include": ["src"],
     "exclude": ["**/node_modules", "**/.*/"]

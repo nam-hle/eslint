@@ -4,9 +4,7 @@
  */
 "use strict";
 
-import { Comment, IndexMap, Token } from "@eslint/types";
-
-import { ASTNode } from "../../estree";
+import { Comment, IndexMap, Token, ASTNode } from "@eslint/types";
 
 import Cursor from "./cursor";
 import { CursorFactory } from "./cursors";

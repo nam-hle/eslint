@@ -8,10 +8,9 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import { ScopeManager, Token } from "@eslint/types";
+import { ScopeManager, Token, ASTNode, Position, ESTree, VisitorKeys } from "@eslint/types";
 import { isCommentToken } from "eslint-utils";
 
-import { ASTNode, Position, RootAST } from "../estree";
 import * as astUtils from "../shared/ast-utils";
 import Traverser from "../shared/traverser";
 
@@ -28,7 +27,7 @@ import TokenStore from "./token-store";
  * @returns {void}
  * @private
  */
-function validate(ast: RootAST) {
+function validate(ast: ESTree.RootAST) {
     if (!ast.tokens) {
         throw new Error("AST is missing the tokens array.");
     }
@@ -152,10 +151,10 @@ function isSpaceBetween(sourceCode: SourceCode, first: ASTNode | Token, second: 
 
 interface SourceCodeOptions {
     text: string;
-    ast: RootAST;
+    ast: ESTree.RootAST;
     parserServices: Record<string, any> | null;
     scopeManager: ScopeManager | null;
-    visitorKeys: object | null;
+    visitorKeys: VisitorKeys | null;
 }
 
 /**
@@ -163,15 +162,16 @@ interface SourceCodeOptions {
  */
 class SourceCode extends TokenStore {
     hasBOM: boolean;
-    ast: RootAST;
+    ast: ESTree.RootAST;
     text: string;
     parserServices: Record<string, any>;
     scopeManager: ScopeManager | null;
-    visitorKeys: object | null;
+    visitorKeys: VisitorKeys | null;
     lines: string[];
     tokensAndComments: Token[];
     lineStartIndices: number[];
     _commentCache: WeakMap<any, any>;
+
     /**
      * @param {string|Object} textOrConfig The source code text or config object.
      * @param {string} textOrConfig.text The source code text.
@@ -181,12 +181,12 @@ class SourceCode extends TokenStore {
      * @param {Object|null} textOrConfig.visitorKeys The visitor keys to traverse AST.
      * @param {ASTNode} [astIfNoConfig] The Program node of the AST representing the code. This AST should be created from the text that BOM was stripped.
      */
-    constructor(textOrConfig: string | SourceCodeOptions, astIfNoConfig: RootAST) {
+    constructor(textOrConfig: string | SourceCodeOptions, astIfNoConfig: ESTree.RootAST) {
         let text,
-            ast: RootAST,
+            ast: ESTree.RootAST,
             parserServices: Record<string, any> | null = null,
             scopeManager: ScopeManager | null = null,
-            visitorKeys: object | null = null;
+            visitorKeys: VisitorKeys | null = null;
 
         // Process overloading.
         if (typeof textOrConfig === "string") {
@@ -241,6 +241,7 @@ class SourceCode extends TokenStore {
          * The visitor keys to traverse AST.
          * @type {Object}
          */
+        // @ts-expect-error
         this.visitorKeys = visitorKeys || Traverser.DEFAULT_VISITOR_KEYS;
 
         // Check the source text for the presence of a shebang since it is parsed as a standard line comment.
@@ -343,7 +344,7 @@ class SourceCode extends TokenStore {
             return this._commentCache.get(node);
         }
 
-        const comments: { leading: Token[]; trailing: Token[] } = {
+        const comments: { leading: ESTree.Comment[] | undefined; trailing: ESTree.Comment[] | undefined } = {
             leading: [],
             trailing: []
         };
@@ -354,8 +355,7 @@ class SourceCode extends TokenStore {
          */
         if (node.type === "Program") {
             if (node.body.length === 0) {
-                // @ts-expect-error
-                comments.leading = node.comments;
+                comments.leading = node.comments ?? [];
             }
         } else {
             /*
@@ -392,12 +392,12 @@ class SourceCode extends TokenStore {
                     break;
                 }
                 // @ts-expect-error
-                comments.leading.push(currentToken);
+                comments.leading?.push(currentToken);
                 // @ts-expect-error
                 currentToken = this.getTokenBefore(currentToken, { includeComments: true });
             }
 
-            comments.leading.reverse();
+            comments.leading?.reverse();
 
             currentToken = this.getTokenAfter(node, { includeComments: true });
 

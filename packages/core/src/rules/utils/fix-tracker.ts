@@ -4,9 +4,8 @@
  */
 "use strict";
 
-import { Token } from "@eslint/types";
+import { Token, ASTNode } from "@eslint/types";
 
-import { ASTNode } from "../../estree";
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------

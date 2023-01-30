@@ -9,14 +9,16 @@
 // Globals
 //-----------------------------------------------------------------------------
 
-const commonjs = {
+import { GlobalsMap } from "@eslint/types";
+
+const commonjs: GlobalsMap = {
     exports: true,
     global: false,
     module: false,
     require: false
 };
 
-const es3 = {
+const es3: GlobalsMap = {
     Array: false,
     Boolean: false,
     constructor: false,
@@ -61,7 +63,7 @@ const es5 = {
     JSON: false
 };
 
-const es2015 = {
+const es2015: GlobalsMap = {
     ...es5,
     ArrayBuffer: false,
     DataView: false,
@@ -85,11 +87,11 @@ const es2015 = {
 };
 
 // no new globals in ES2016
-const es2016 = {
+const es2016: GlobalsMap = {
     ...es2015
 };
 
-const es2017 = {
+const es2017: GlobalsMap = {
     ...es2016,
     Atomics: false,
     SharedArrayBuffer: false
@@ -101,11 +103,11 @@ const es2018 = {
 };
 
 // no new globals in ES2019
-const es2019 = {
+const es2019: GlobalsMap = {
     ...es2018
 };
 
-const es2020 = {
+const es2020: GlobalsMap = {
     ...es2019,
     BigInt: false,
     BigInt64Array: false,
@@ -113,18 +115,18 @@ const es2020 = {
     globalThis: false
 };
 
-const es2021 = {
+const es2021: GlobalsMap = {
     ...es2020,
     AggregateError: false,
     FinalizationRegistry: false,
     WeakRef: false
 };
 
-const es2022 = {
+const es2022: GlobalsMap = {
     ...es2021
 };
 
-const es2023 = {
+const es2023: GlobalsMap = {
     ...es2022
 };
 

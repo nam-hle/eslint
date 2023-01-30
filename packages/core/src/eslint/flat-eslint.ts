@@ -26,6 +26,7 @@ import LintResultCache from "../cli-engine/lint-result-cache";
 import { FlatConfigArray } from "../config/flat-config-array";
 import { getRuleFromConfig } from "../config/flat-config-helpers";
 import { Linter } from "../linter";
+import { assert } from "../shared/assert";
 import { packageJson } from "../shared/package";
 
 import { ESLintOptions } from "./eslint";
@@ -269,7 +270,6 @@ function processLintReport(eslint: CLIEngine, { results }: LintReport): LintResu
         Object.defineProperty(result, "usedDeprecatedRules", descriptor);
     }
 
-    // @ts-expect-error
     return results;
 }
 
@@ -366,7 +366,6 @@ async function calculateConfigArray(
         // @ts-expect-error
         configFile,
         ignore: shouldIgnore,
-        // @ts-expect-error
         ignorePatterns
     }: ESLintOptions
 ): Promise<FlatConfigArray> {
@@ -550,7 +549,6 @@ function verifyText(config: {
         result.source = text;
     }
 
-    // @ts-expect-error
     return result;
 }
 
@@ -693,7 +691,10 @@ class FlatESLint {
                     }
                     return typeof result.output === "string" && path.isAbsolute(result.filePath);
                 })
-                .map(r => fs.writeFile(r.filePath, r.output))
+                .map(r => {
+                    assert(r.output);
+                    fs.writeFile(r.filePath, r.output);
+                })
         );
     }
 

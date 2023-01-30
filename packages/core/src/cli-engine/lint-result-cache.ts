@@ -12,8 +12,9 @@ import assert from "assert";
 import fs from "fs";
 
 import { ConfigArray } from "@eslint/eslintrc";
+import { LintResult } from "@eslint/types";
 import Debug from "debug";
-import fileEntryCache, { FileEntryCache } from "file-entry-cache";
+import fileEntryCache, { FileDescriptor, FileEntryCache } from "file-entry-cache";
 import stringify from "json-stable-stringify-without-jsonify";
 
 import { packageJson } from "../shared/package";
@@ -59,6 +60,13 @@ function hashOfConfigFor(config: ConfigArray) {
 //-----------------------------------------------------------------------------
 // Public Interface
 //-----------------------------------------------------------------------------
+
+interface ExtendedFileDescriptor extends FileDescriptor {
+    meta?: FileDescriptor["meta"] & {
+        hashOfConfig?: string;
+        results?: LintResult;
+    };
+}
 
 /**
  * Lint result cache. This wraps around the file-entry-cache module,
@@ -106,11 +114,9 @@ class LintResultCache {
          *    was previously linted
          * If any of these are not true, we will not reuse the lint results.
          */
-        const fileDescriptor = this.fileEntryCache.getFileDescriptor(filePath);
+        const fileDescriptor: ExtendedFileDescriptor = this.fileEntryCache.getFileDescriptor(filePath);
         const hashOfConfig = hashOfConfigFor(config);
-        const changed =
-            // @ts-expect-error
-            fileDescriptor.changed || fileDescriptor.meta?.hashOfConfig !== hashOfConfig;
+        const changed = fileDescriptor.changed || fileDescriptor.meta?.hashOfConfig !== hashOfConfig;
 
         if (fileDescriptor.notFound) {
             debug(`File not found on the file system: ${filePath}`);
@@ -123,15 +129,12 @@ class LintResultCache {
         }
 
         // If source is present but null, need to reread the file from the filesystem.
-        // @ts-expect-error
-        if (fileDescriptor.meta.results && fileDescriptor.meta.results.source === null) {
+        if (fileDescriptor.meta?.results && fileDescriptor.meta.results.source === null) {
             debug(`Rereading cached result source from filesystem: ${filePath}`);
-            // @ts-expect-error
             fileDescriptor.meta.results.source = fs.readFileSync(filePath, "utf-8");
         }
 
-        // @ts-expect-error
-        return fileDescriptor.meta.results;
+        return fileDescriptor.meta?.results;
     }
 
     /**
@@ -145,7 +148,7 @@ class LintResultCache {
      * @param {Object} result The lint result to be set for the file.
      * @returns {void}
      */
-    setCachedLintResults(filePath: string, config: ConfigArray, result: object) {
+    setCachedLintResults(filePath: string, config: ConfigArray, result: LintResult) {
         if (result && Object.prototype.hasOwnProperty.call(result, "output")) {
             return;
         }
@@ -156,7 +159,7 @@ class LintResultCache {
             debug(`Updating cached result: ${filePath}`);
 
             // Serialize the result, except that we want to remove the file source if present.
-            const resultToSerialize = Object.assign({}, result);
+            const resultToSerialize: LintResult = Object.assign({}, result);
 
             /*
              * Set result.source to null.
@@ -164,7 +167,6 @@ class LintResultCache {
              * read the file from the filesystem to set the value again.
              */
             if (Object.prototype.hasOwnProperty.call(resultToSerialize, "source")) {
-                // @ts-expect-error
                 resultToSerialize.source = null;
             }
 

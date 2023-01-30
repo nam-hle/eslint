@@ -8,9 +8,7 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import { Rule, Token, RuleFixer } from "@eslint/types";
-
-import { ArrowFunctionExpression } from "../estree";
+import { Rule, Token, RuleFixer, ESTree } from "@eslint/types";
 
 import astUtils from "./utils/ast-utils";
 
@@ -20,10 +18,10 @@ import astUtils from "./utils/ast-utils";
 
 /**
  * Determines if the given arrow function has block body.
- * @param {ASTNode} node `ArrowFunctionExpression` node.
+ * @param {ASTNode} node `ESTree.ArrowFunctionExpression` node.
  * @returns {boolean} `true` if the function has block body.
  */
-function hasBlockBody(node: ArrowFunctionExpression) {
+function hasBlockBody(node: ESTree.ArrowFunctionExpression) {
     return node.body.type === "BlockStatement";
 }
 
@@ -76,10 +74,10 @@ const rule: Rule = {
         /**
          * Finds opening paren of parameters for the given arrow function, if it exists.
          * It is assumed that the given arrow function has exactly one parameter.
-         * @param {ASTNode} node `ArrowFunctionExpression` node.
+         * @param {ASTNode} node `ESTree.ArrowFunctionExpression` node.
          * @returns {Token|null} the opening paren, or `null` if the given arrow function doesn't have parens of parameters.
          */
-        function findOpeningParenOfParams(node: ArrowFunctionExpression): Token | null {
+        function findOpeningParenOfParams(node: ESTree.ArrowFunctionExpression): Token | null {
             const tokenBeforeParams = sourceCode.getTokenBefore(node.params[0]);
 
             if (tokenBeforeParams && astUtils.isOpeningParenToken(tokenBeforeParams) && node.range[0] <= tokenBeforeParams.range[0]) {
@@ -92,21 +90,21 @@ const rule: Rule = {
         /**
          * Finds closing paren of parameters for the given arrow function.
          * It is assumed that the given arrow function has parens of parameters and that it has exactly one parameter.
-         * @param {ASTNode} node `ArrowFunctionExpression` node.
+         * @param {ASTNode} node `ESTree.ArrowFunctionExpression` node.
          * @returns {Token} the closing paren of parameters.
          */
-        function getClosingParenOfParams(node: ArrowFunctionExpression) {
+        function getClosingParenOfParams(node: ESTree.ArrowFunctionExpression) {
             return sourceCode.getTokenAfter(node.params[0], astUtils.isClosingParenToken);
         }
 
         /**
          * Determines whether the given arrow function has comments inside parens of parameters.
          * It is assumed that the given arrow function has parens of parameters.
-         * @param {ASTNode} node `ArrowFunctionExpression` node.
+         * @param {ASTNode} node `ESTree.ArrowFunctionExpression` node.
          * @param {Token} openingParen Opening paren of parameters.
          * @returns {boolean} `true` if the function has at least one comment inside of parens of parameters.
          */
-        function hasCommentsInParensOfParams(node: ArrowFunctionExpression, openingParen: Token) {
+        function hasCommentsInParensOfParams(node: ESTree.ArrowFunctionExpression, openingParen: Token) {
             return sourceCode.commentsExistBetween(openingParen, getClosingParenOfParams(node));
         }
 
@@ -115,18 +113,18 @@ const rule: Rule = {
          * in which case it will be assumed that the existing parens of parameters are necessary.
          * Only tokens within the range of the arrow function (tokens that are part of the arrow function) are taken into account.
          * Example: <T>(a) => b
-         * @param {ASTNode} node `ArrowFunctionExpression` node.
+         * @param {ASTNode} node `ESTree.ArrowFunctionExpression` node.
          * @param {Token} openingParen Opening paren of parameters.
          * @returns {boolean} `true` if the function has at least one unexpected token.
          */
-        function hasUnexpectedTokensBeforeOpeningParen(node: ArrowFunctionExpression, openingParen: Token) {
+        function hasUnexpectedTokensBeforeOpeningParen(node: ESTree.ArrowFunctionExpression, openingParen: Token) {
             const expectedCount = node.async ? 1 : 0;
 
             return sourceCode.getFirstToken(node, { skip: expectedCount }) !== openingParen;
         }
 
         return {
-            "ArrowFunctionExpression[params.length=1]"(node: ArrowFunctionExpression) {
+            "ESTree.ArrowFunctionExpression[params.length=1]"(node: ESTree.ArrowFunctionExpression) {
                 const shouldHaveParens = !asNeeded || (requireForBlockBody && hasBlockBody(node));
                 const openingParen = findOpeningParenOfParams(node);
                 const hasParens = openingParen !== null;

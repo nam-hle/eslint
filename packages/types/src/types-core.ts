@@ -4,7 +4,7 @@
  */
 "use strict";
 
-import { JSONSchema4 } from "json-schema";
+import type { JSONSchema4 } from "json-schema";
 
 import { DeprecatedRuleInfo, Fix, GlobalConf, LintMessage, Parser, ParserOptions, RuleMeta, SeverityNumber } from "./types-eslintrc";
 import { ASTNode, Position, SourceLocation } from "./types-estree";
@@ -14,15 +14,16 @@ export interface Listener {
     (...args: any[]): any;
 }
 
-export interface Token {
+export interface Token extends Comment {
     type: string;
-    range: [number, number];
-    value: string;
-    loc: SourceLocation;
+}
+
+export interface VisitorKeys {
+    [nodeType: string]: string[];
 }
 export interface Comment {
     value: string;
-    range: number[];
+    range: [number, number];
     loc: SourceLocation;
 }
 
@@ -482,9 +483,9 @@ export interface LintResult {
     warningCount: number;
     fixableErrorCount: number;
     fixableWarningCount: number;
-    source: string;
-    output: string;
-    usedDeprecatedRules: DeprecatedRuleInfo[];
+    source?: string | null;
+    output?: string;
+    usedDeprecatedRules?: DeprecatedRuleInfo[];
 }
 
 /**
