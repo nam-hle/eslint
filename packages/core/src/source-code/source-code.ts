@@ -131,11 +131,7 @@ function isSpaceBetween(sourceCode: SourceCode, first: ASTNode | Token, second: 
              * For backward compatibility, check spaces in JSXText.
              * https://github.com/eslint/eslint/issues/12614
              */
-            (checkInsideOfJSXText &&
-                nextToken !== finalToken &&
-                // @ts-expect-error
-                nextToken.type === "JSXText" &&
-                /\s/u.test(nextToken.value))
+            (checkInsideOfJSXText && nextToken !== finalToken && nextToken.type === "JSXText" && /\s/u.test(nextToken.value))
         ) {
             return true;
         }
@@ -306,7 +302,7 @@ class SourceCode extends TokenStore {
      * @returns {string} The text representing the AST node.
      * @public
      */
-    getText(node: ASTNode, beforeCount: number, afterCount: number) {
+    getText(node?: ASTNode, beforeCount?: number, afterCount?: number) {
         if (node) {
             return this.text.slice(Math.max(node.range[0] - (beforeCount || 0), 0), node.range[1] + (afterCount || 0));
         }
@@ -393,7 +389,6 @@ class SourceCode extends TokenStore {
                 }
                 // @ts-expect-error
                 comments.leading?.push(currentToken);
-                // @ts-expect-error
                 currentToken = this.getTokenBefore(currentToken, { includeComments: true });
             }
 
@@ -442,7 +437,6 @@ class SourceCode extends TokenStore {
             if (
                 tokenBefore &&
                 isCommentToken(tokenBefore) &&
-                // @ts-expect-error
                 tokenBefore.type === "Block" &&
                 tokenBefore.value.charAt(0) === "*" &&
                 astNode.loc.start.line - tokenBefore.loc.end.line <= 1

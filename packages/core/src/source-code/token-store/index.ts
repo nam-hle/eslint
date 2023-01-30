@@ -335,7 +335,8 @@ export = class TokenStore {
      * @param {number|Function|Object} [options=0] The option object. Same options as getFirstToken()
      * @returns {Token|null} An object representing the token.
      */
-    getTokenBefore(node: ASTNode | Token, options: SkipCursorOption = 0) {
+    getTokenBefore(node: ASTNode | Token, options: SkipCursorOption = 0): Token | null {
+        // @ts-expect-error
         return createCursorWithSkip(
             cursors.backward,
             this[TOKENS],
@@ -353,7 +354,8 @@ export = class TokenStore {
      * @param {number|Function|Object} [options=0] The option object. Same options as getFirstToken()
      * @returns {Token|null} An object representing the token.
      */
-    getTokenAfter(node: ASTNode | Token | Comment, options: SkipCursorOption = 0) {
+    getTokenAfter(node: ASTNode | Token | Comment, options: SkipCursorOption = 0): Token | null {
+        // @ts-expect-error
         return createCursorWithSkip(
             cursors.forward,
             this[TOKENS],

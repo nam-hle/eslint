@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @fileoverview Common utils for AST.
  * @author Gyandeep Singh
@@ -10,7 +9,7 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-import { ASTNode, Token, ESTree } from "@eslint/types";
+import { ASTNode, Token, ESTree, Comment } from "@eslint/types";
 import escapeRegExp from "escape-string-regexp";
 import { latestEcmaVersion, tokenize } from "espree";
 import esutils from "esutils";
@@ -338,7 +337,6 @@ function isSpecificMemberAccess(node: ASTNode, objectName: string | RegExp | nul
         return false;
     }
 
-    // @ts-expect-error
     if (objectName && !isSpecificId(checkNode.object, objectName)) {
         return false;
     }
@@ -504,7 +502,6 @@ function hasJSDocThisTag(node: ASTNode, sourceCode: SourceCode) {
     // e.g.
     //     sinon.test(/* @this sinon.Sandbox */function() { this.spy(); });
 
-    // @ts-expect-error
     return sourceCode.getCommentsBefore(node).some(comment => thisTagPattern.test(comment.value));
 }
 
@@ -516,13 +513,12 @@ function hasJSDocThisTag(node: ASTNode, sourceCode: SourceCode) {
  * @private
  */
 function isParenthesised(sourceCode: SourceCode, node: ASTNode) {
-    // @ts-expect-error
     const previousToken = sourceCode.getTokenBefore(node),
-        // @ts-expect-error
         nextToken = sourceCode.getTokenAfter(node);
 
     return (
-        Boolean(previousToken && nextToken) &&
+        !!previousToken &&
+        !!nextToken &&
         previousToken.value === "(" &&
         previousToken.range[1] <= node.range[0] &&
         nextToken.value === ")" &&
@@ -671,20 +667,19 @@ function isKeywordToken(token: Token) {
  * @param {SourceCode} sourceCode The source code object to get tokens.
  * @returns {Token} `(` token.
  */
-function getOpeningParenOfParams(node: ASTNode, sourceCode: SourceCode) {
+function getOpeningParenOfParams(node: ESTree.Function_, sourceCode: SourceCode) {
     // If the node is an arrow function and doesn't have parens, this returns the identifier of the first param.
-    // @ts-expect-error
     if (node.type === "ArrowFunctionExpression" && node.params.length === 1) {
-        // @ts-expect-error
         const argToken = sourceCode.getFirstToken(node.params[0]);
         // @ts-expect-error
         const maybeParenToken = sourceCode.getTokenBefore(argToken);
 
+        // @ts-expect-error
         return isOpeningParenToken(maybeParenToken) ? maybeParenToken : argToken;
     }
 
     // Otherwise, returns paren.
-    return node.id
+    return "id" in node && node.id
         ? // @ts-expect-error
           sourceCode.getTokenAfter(node.id, isOpeningParenToken)
         : // @ts-expect-error
@@ -699,9 +694,7 @@ function getOpeningParenOfParams(node: ASTNode, sourceCode: SourceCode) {
  * @returns {boolean} the source code for the given node.
  */
 function equalTokens(left: ASTNode, right: ASTNode, sourceCode: SourceCode) {
-    // @ts-expect-error
     const tokensL = sourceCode.getTokens(left);
-    // @ts-expect-error
     const tokensR = sourceCode.getTokens(right);
 
     if (tokensL.length !== tokensR.length) {
@@ -778,7 +771,6 @@ function getSwitchCaseColonToken(node: ASTNode, sourceCode: SourceCode) {
         // @ts-expect-error
         return sourceCode.getTokenAfter(node.test, isColonToken);
     }
-    // @ts-expect-error
     return sourceCode.getFirstToken(node, 1);
 }
 
@@ -792,7 +784,7 @@ function getSwitchCaseColonToken(node: ASTNode, sourceCode: SourceCode) {
  *   - `ExportAllDeclaration#exported`
  * @returns {string} The module export name.
  */
-function getModuleExportName(node: ASTNode) {
+function getModuleExportName(node: ESTree.Identifier | ESTree.Literal) {
     if (node.type === "Identifier") {
         return node.name;
     }
@@ -807,20 +799,19 @@ function getModuleExportName(node: ASTNode) {
  * @returns {boolean | null} `true` when node is truthy, `false` when node is falsy,
  *  `null` when it cannot be determined.
  */
-function getBooleanValue(node: ASTNode): boolean | null {
+function getBooleanValue(node: ESTree.Literal): boolean | null {
     if (node.value === null) {
         /*
          * it might be a null literal or bigint/regex literal in unsupported environments .
          * https://github.com/estree/estree/blob/14df8a024956ea289bd55b9c2226a1d5b8a473ee/es5.md#regexpliteral
          * https://github.com/estree/estree/blob/14df8a024956ea289bd55b9c2226a1d5b8a473ee/es2020.md#bigintliteral
          */
-        // @ts-expect-error
         if (node.raw === "null") {
             return false;
         }
 
         // regex is always truthy
-        if (typeof node.regex === "object") {
+        if (ESTree.RegExpLiteral.isInstance(node)) {
             return true;
         }
 
@@ -913,12 +904,13 @@ function isConstant(scope: any, node: ASTNode, inBooleanPosition: boolean): bool
             return true;
         case "TemplateLiteral":
             return (
-                (inBooleanPosition && node.quasis.some(quasi => quasi.value.cooked.length)) ||
+                (inBooleanPosition && node.quasis.some(quasi => quasi.value.cooked?.length)) ||
                 node.expressions.every(exp => isConstant(scope, exp, false))
             );
 
         case "ArrayExpression": {
             if (!inBooleanPosition) {
+                // @ts-expect-error
                 return node.elements.every(element => isConstant(scope, element, false));
             }
             return true;
@@ -1091,7 +1083,7 @@ export = {
      * @param {Line|Block} node The comment token to be checked
      * @returns {boolean} `true` if the node is an ESLint directive comment
      */
-    isDirectiveComment(node: ASTNode) {
+    isDirectiveComment(node: ESTree.Comment) {
         const comment = node.value.trim();
 
         return (node.type === "Line" && comment.startsWith("eslint-")) || (node.type === "Block" && ESLINT_DIRECTIVE_PATTERN.test(comment));
@@ -1165,7 +1157,6 @@ export = {
          * Therefore, A expression node at `PropertyDefinition#value` is a function.
          * In this case, `this` is always not default binding.
          */
-        // @ts-expect-error
         if (node.parent.type === "PropertyDefinition" && node.parent.value === node) {
             return false;
         }
@@ -1178,6 +1169,7 @@ export = {
         if ((capIsConstructor && isES5Constructor(node)) || hasJSDocThisTag(node, sourceCode)) {
             return false;
         }
+        // @ts-expect-error
         const isAnonymous = node.id === null;
         let currentNode = node;
 
@@ -1212,14 +1204,16 @@ export = {
                     if (func === null || !isCallee(func)) {
                         return true;
                     }
+
+                    // @ts-expect-error
                     currentNode = func.parent;
                     break;
                 }
                 case "ArrowFunctionExpression":
-                    // @ts-expect-error
                     if (currentNode !== parent.body || !isCallee(parent)) {
                         return true;
                     }
+                    // @ts-expect-error
                     currentNode = parent.parent;
                     break;
 
@@ -1237,7 +1231,6 @@ export = {
                 case "Property":
                 case "PropertyDefinition":
                 case "MethodDefinition":
-                    // @ts-expect-error
                     return parent.value !== currentNode;
 
                 /*
@@ -1265,9 +1258,7 @@ export = {
                     return !(
                         capIsConstructor &&
                         isAnonymous &&
-                        // @ts-expect-error
                         parent.init === currentNode &&
-                        // @ts-expect-error
                         parent.id.type === "Identifier" &&
                         startsWithUpperCase(parent.id.name)
                     );
@@ -1279,16 +1270,14 @@ export = {
                  *   (function foo() { ... }).apply(obj, []);
                  */
                 case "MemberExpression":
-                    if (
-                        // @ts-expect-error
-                        parent.object === currentNode &&
-                        isSpecificMemberAccess(parent, null, bindOrCallOrApplyPattern)
-                    ) {
+                    if (parent.object === currentNode && isSpecificMemberAccess(parent, null, bindOrCallOrApplyPattern)) {
                         const maybeCalleeNode = parent.parent.type === "ChainExpression" ? parent.parent : parent;
 
                         return !(
                             isCallee(maybeCalleeNode) &&
+                            // @ts-expect-error
                             maybeCalleeNode.parent.arguments.length >= 1 &&
+                            // @ts-expect-error
                             !isNullOrUndefined(maybeCalleeNode.parent.arguments[0])
                         );
                     }
@@ -1434,6 +1423,7 @@ export = {
      * @returns {boolean} `true` if the node is an empty function.
      */
     isEmptyFunction(node: ASTNode | null) {
+        // @ts-expect-error
         return node && isFunction(node) && module.exports.isEmptyBlock(node.body);
     },
 
@@ -1454,7 +1444,6 @@ export = {
              * Do not check arrow functions with implicit return.
              * `() => "use strict";` returns the string `"use strict"`.
              */
-            // @ts-expect-error
             (node.type === "ArrowFunctionExpression" && node.body.type === "BlockStatement")
         ) {
             // @ts-expect-error
@@ -1503,6 +1492,7 @@ export = {
      *
      */
     isDecimalInteger(node: ASTNode) {
+        // @ts-expect-error
         return node.type === "Literal" && typeof node.value === "number" && DECIMAL_INTEGER_PATTERN.test(node.raw);
     },
 
@@ -1583,14 +1573,15 @@ export = {
             if (parent.static) {
                 tokens.push("static");
             }
-            // @ts-expect-error
             if (!parent.computed && parent.key.type === "PrivateIdentifier") {
                 tokens.push("private");
             }
         }
+        // @ts-expect-error
         if (node.async) {
             tokens.push("async");
         }
+        // @ts-expect-error
         if (node.generator) {
             tokens.push("generator");
         }
@@ -1616,20 +1607,22 @@ export = {
         }
 
         if (parent.type === "Property" || parent.type === "MethodDefinition" || parent.type === "PropertyDefinition") {
-            // @ts-expect-error
             if (!parent.computed && parent.key.type === "PrivateIdentifier") {
-                // @ts-expect-error
                 tokens.push(`#${parent.key.name}`);
             } else {
                 const name = getStaticPropertyName(parent);
 
                 if (name !== null) {
                     tokens.push(`'${name}'`);
+                    // @ts-expect-error
                 } else if (node.id) {
+                    // @ts-expect-error
                     tokens.push(`'${node.id.name}'`);
                 }
             }
+            // @ts-expect-error
         } else if (node.id) {
+            // @ts-expect-error
             tokens.push(`'${node.id.name}'`);
         }
 
@@ -1740,15 +1733,19 @@ export = {
 
         if (parent.type === "Property" || parent.type === "MethodDefinition" || parent.type === "PropertyDefinition") {
             start = parent.loc.start;
+            // @ts-expect-error
             end = getOpeningParenOfParams(node, sourceCode).loc.start;
         } else if (node.type === "ArrowFunctionExpression") {
             // @ts-expect-error
             const arrowToken = sourceCode.getTokenBefore(node.body, isArrowToken);
 
+            // @ts-expect-error
             start = arrowToken.loc.start;
+            // @ts-expect-error
             end = arrowToken.loc.end;
         } else {
             start = node.loc.start;
+            // @ts-expect-error
             end = getOpeningParenOfParams(node, sourceCode).loc.start;
         }
 
@@ -1828,9 +1825,7 @@ export = {
      * @returns {string} The text representing the node, with all surrounding parentheses included
      */
     getParenthesisedText(sourceCode: SourceCode, node: ASTNode): string {
-        // @ts-expect-error
         let leftToken = sourceCode.getFirstToken(node);
-        // @ts-expect-error
         let rightToken = sourceCode.getLastToken(node);
 
         while (
@@ -1852,7 +1847,7 @@ export = {
             // @ts-expect-error
             rightToken = sourceCode.getTokenAfter(rightToken);
         }
-
+        // @ts-expect-error
         return sourceCode.getText().slice(leftToken.range[0], rightToken.range[1]);
     },
 
@@ -1922,7 +1917,7 @@ export = {
      * @returns {boolean} `true` if the node is a number or bigint literal.
      */
     isNumericLiteral(node: ASTNode) {
-        return node.type === "Literal" && (typeof node.value === "number" || Boolean(node.bigint));
+        return node.type === "Literal" && (typeof node.value === "number" || ESTree.BigIntLiteral.isInstance(node));
     },
 
     /**
@@ -2062,9 +2057,7 @@ export = {
         // Convert the index to loc.
         const start = sourceCode.getLocFromIndex(comment.range[0] + "/*".length + (match ? match.index + 1 : 0));
         const end = {
-            // @ts-expect-error
             line: start.line,
-            // @ts-expect-error
             column: start.column + (match ? name.length : 1)
         };
 
