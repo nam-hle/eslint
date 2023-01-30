@@ -124,7 +124,7 @@ const rule: Rule = {
         }
 
         return {
-            "ESTree.ArrowFunctionExpression[params.length=1]"(node: ESTree.ArrowFunctionExpression) {
+            "ArrowFunctionExpression[params.length=1]"(node: ESTree.ArrowFunctionExpression) {
                 const shouldHaveParens = !asNeeded || (requireForBlockBody && hasBlockBody(node));
                 const openingParen = findOpeningParenOfParams(node);
                 const hasParens = openingParen !== null;
