@@ -11,6 +11,8 @@
 import { ASTNode } from "@eslint/types";
 import Debug from "debug";
 
+import { assert } from "../../shared/assert";
+
 import CodePath from "./code-path";
 import CodePathSegment from "./code-path-segment";
 import CodePathState from "./code-path-state";
@@ -166,9 +168,8 @@ export = {
 
         while (stack.length > 0) {
             const item = stack.pop();
-            // @ts-expect-error
+            assert(item);
             const segment = item[0];
-            // @ts-expect-error
             const index = item[1];
 
             if (done[segment.id] && index === 0) {

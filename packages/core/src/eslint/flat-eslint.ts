@@ -404,16 +404,13 @@ async function calculateConfigArray(
         const fileConfig = await loadFlatConfigFile(configFilePath);
 
         if (Array.isArray(fileConfig)) {
-            // @ts-expect-error
             configs.push(...fileConfig);
         } else {
-            // @ts-expect-error
             configs.push(fileConfig);
         }
     }
 
     // add in any configured defaults
-    // @ts-expect-error
     configs.push(...slots.defaultConfigs);
 
     let allIgnorePatterns = [];
@@ -451,7 +448,6 @@ async function calculateConfigArray(
          * Ignore patterns are added to the end of the config array
          * so they can override default ignores.
          */
-        // @ts-expect-error
         configs.push({
             ignores: allIgnorePatterns
         });
@@ -459,10 +455,8 @@ async function calculateConfigArray(
 
     if (overrideConfig) {
         if (Array.isArray(overrideConfig)) {
-            // @ts-expect-error
             configs.push(...overrideConfig);
         } else {
-            // @ts-expect-error
             configs.push(overrideConfig);
         }
     }

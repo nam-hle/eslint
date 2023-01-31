@@ -9,7 +9,6 @@
 // Requirements
 //-----------------------------------------------------------------------------
 
-// @ts-expect-error
 import { ConfigArray, ConfigArraySymbol } from "@humanwhocodes/config-array";
 
 import recommendedConfig from "../conf/eslint-recommended";
@@ -34,7 +33,7 @@ function splitPluginIdentifier(identifier: string) {
     const parts = identifier.split("/");
 
     return {
-        objectName: parts.pop(),
+        objectName: parts.pop() as string,
         pluginName: parts.join("/")
     };
 }
@@ -75,10 +74,8 @@ class FlatConfigArray extends ConfigArray {
         });
 
         if (baseConfig[Symbol.iterator]) {
-            // @ts-expect-error
             this.unshift(...baseConfig);
         } else {
-            // @ts-expect-error
             this.unshift(baseConfig);
         }
 
@@ -156,17 +153,10 @@ class FlatConfigArray extends ConfigArray {
 
                 parserName = languageOptions.parser;
 
-                if (
-                    !plugins ||
-                    !plugins[pluginName] ||
-                    !plugins[pluginName].parsers ||
-                    // @ts-expect-error
-                    !plugins[pluginName].parsers[localParserName]
-                ) {
+                if (!plugins || !plugins[pluginName] || !plugins[pluginName].parsers || !plugins[pluginName].parsers[localParserName]) {
                     throw new TypeError(`Key "parser": Could not find "${localParserName}" in plugin "${pluginName}".`);
                 }
 
-                // @ts-expect-error
                 languageOptions.parser = plugins[pluginName].parsers[localParserName];
             } else {
                 invalidParser = true;
@@ -184,13 +174,11 @@ class FlatConfigArray extends ConfigArray {
                     !plugins ||
                     !plugins[pluginName] ||
                     !plugins[pluginName].processors ||
-                    // @ts-expect-error
                     !plugins[pluginName].processors[localProcessorName]
                 ) {
                     throw new TypeError(`Key "processor": Could not find "${localProcessorName}" in plugin "${pluginName}".`);
                 }
 
-                // @ts-expect-error
                 config.processor = plugins[pluginName].processors[localProcessorName];
             } else {
                 invalidProcessor = true;

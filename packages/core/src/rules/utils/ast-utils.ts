@@ -14,6 +14,7 @@ import escapeRegExp from "escape-string-regexp";
 import { latestEcmaVersion, tokenize } from "espree";
 import esutils from "esutils";
 
+import { assert } from "../../shared/assert";
 import SourceCode from "../../source-code/source-code";
 
 const { breakableTypePattern, createGlobalLinebreakMatcher, lineBreakPattern, shebangPattern } = require("../../shared/ast-utils");
@@ -113,7 +114,7 @@ function getUpperFunction(node: ASTNode) {
  * @param {ASTNode|null} node A node to check.
  * @returns {boolean} `true` if the node is a function node.
  */
-function isFunction(node: ASTNode | null) {
+function isFunction(node: ASTNode | null): node is ESTree.ArrowFunctionExpression | ESTree.FunctionDeclaration | ESTree.FunctionExpression {
     return Boolean(node && anyFunctionPattern.test(node.type));
 }
 
@@ -594,7 +595,7 @@ function isColonToken(token: Token) {
  * @param {Token} token The token to check.
  * @returns {boolean} `true` if the token is an opening parenthesis token.
  */
-function isOpeningParenToken(token: Token) {
+function isOpeningParenToken(token: Token): boolean {
     return token.value === "(" && token.type === "Punctuator";
 }
 
@@ -667,18 +668,20 @@ function isKeywordToken(token: Token) {
  * @param {SourceCode} sourceCode The source code object to get tokens.
  * @returns {Token} `(` token.
  */
-function getOpeningParenOfParams(node: ESTree.Function_, sourceCode: SourceCode) {
+function getOpeningParenOfParams(node: ESTree.Function_, sourceCode: SourceCode): Token {
     // If the node is an arrow function and doesn't have parens, this returns the identifier of the first param.
     if (node.type === "ArrowFunctionExpression" && node.params.length === 1) {
         const argToken = sourceCode.getFirstToken(node.params[0]);
         // @ts-expect-error
         const maybeParenToken = sourceCode.getTokenBefore(argToken);
 
-        // @ts-expect-error
+        assert(Token.isAssignableFrom(argToken));
+        assert(Token.isAssignableFrom(maybeParenToken));
         return isOpeningParenToken(maybeParenToken) ? maybeParenToken : argToken;
     }
 
     // Otherwise, returns paren.
+    // @ts-expect-error
     return "id" in node && node.id
         ? // @ts-expect-error
           sourceCode.getTokenAfter(node.id, isOpeningParenToken)
@@ -765,8 +768,7 @@ function isLogicalAssignmentOperator(operator: string) {
  * @param {SourceCode} sourceCode The source code object to get tokens.
  * @returns {Token} The colon token of the node.
  */
-function getSwitchCaseColonToken(node: ASTNode, sourceCode: SourceCode) {
-    // @ts-expect-error
+function getSwitchCaseColonToken(node: ESTree.SwitchCase, sourceCode: SourceCode) {
     if (node.test) {
         // @ts-expect-error
         return sourceCode.getTokenAfter(node.test, isColonToken);
@@ -1423,7 +1425,6 @@ export = {
      * @returns {boolean} `true` if the node is an empty function.
      */
     isEmptyFunction(node: ASTNode | null) {
-        // @ts-expect-error
         return node && isFunction(node) && module.exports.isEmptyBlock(node.body);
     },
 
@@ -1492,8 +1493,7 @@ export = {
      *
      */
     isDecimalInteger(node: ASTNode) {
-        // @ts-expect-error
-        return node.type === "Literal" && typeof node.value === "number" && DECIMAL_INTEGER_PATTERN.test(node.raw);
+        return node.type === "Literal" && typeof node.value === "number" && DECIMAL_INTEGER_PATTERN.test(node.raw ?? "");
     },
 
     /**

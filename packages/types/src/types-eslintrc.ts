@@ -372,6 +372,11 @@ export interface Plugin {
     rules?: RulesMap;
 }
 
+export interface PluginInfo {
+    objectName: string;
+    pluginName: string;
+}
+
 export interface ResolvedPlugin extends Plugin {
     definition: Record<string, any>;
     filePath: string;

@@ -200,7 +200,7 @@ function processUnusedDisableDirectives(allDirectives: Directive[]) {
  * @returns {{problems: Problem[], unusedDisableDirectives: Problem[]}} An object with a list
  * of problems (including suppressed ones) and unused eslint-disable directives
  */
-function applyDirectives(options: Options) {
+function applyDirectives(options: Options): { problems: Problem[]; unusedDisableDirectives: Problem[] } {
     const problems = [];
     const usedDisableDirectives = new Set();
 
@@ -271,7 +271,7 @@ function applyDirectives(options: Options) {
 interface Directive {
     type: "disable" | "enable" | "disable-line" | "disable-next-line";
     ruleId: string | null;
-    justification: string;
+    justification?: string;
     unprocessedDirective: any;
     line: number;
     column: number;
@@ -281,7 +281,7 @@ interface Problem {
     ruleId: string | null;
     line: number;
     column: number;
-    suppressions: Suppressions[];
+    suppressions?: Suppressions[];
 }
 
 interface Options {
@@ -322,7 +322,7 @@ export = (options: Options) => {
         .sort(compareLocations);
 
     const lineDirectives = directives
-        .flatMap(directive => {
+        .flatMap<Directive>(directive => {
             switch (directive.type) {
                 case "disable":
                 case "enable":
@@ -378,7 +378,6 @@ export = (options: Options) => {
     });
     const lineDirectivesResult = applyDirectives({
         problems: blockDirectivesResult.problems,
-        // @ts-expect-error
         directives: lineDirectives,
         disableFixes,
         reportUnusedDisableDirectives
@@ -386,9 +385,7 @@ export = (options: Options) => {
 
     return reportUnusedDisableDirectives !== "off"
         ? lineDirectivesResult.problems
-              // @ts-expect-error
               .concat(blockDirectivesResult.unusedDisableDirectives)
-              // @ts-expect-error
               .concat(lineDirectivesResult.unusedDisableDirectives)
               .sort(compareLocations)
         : lineDirectivesResult.problems;

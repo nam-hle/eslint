@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 // Requirements
 //-----------------------------------------------------------------------------
+import { RuleConf } from "@eslint/types";
 import { ErrorObject } from "ajv";
 
 import ruleReplacements from "../conf/replacements.json";
@@ -91,7 +92,7 @@ class RuleValidator {
      * @returns {void}
      * @throws {Error} If a rule's configuration does not match its schema.
      */
-    validate(config: Record<string, any>) {
+    validate(config: Record<string, RuleConf>) {
         if (!config.rules) {
             return;
         }
@@ -111,7 +112,6 @@ class RuleValidator {
              * this validation occurs after FlatConfigArray has merged and
              * normalized values.
              */
-            // @ts-expect-error
             if (ruleOptions[0] === 0) {
                 continue;
             }
@@ -134,7 +134,6 @@ class RuleValidator {
             const validateRule = this.validators.get(rule);
 
             if (validateRule) {
-                // @ts-expect-error
                 validateRule(ruleOptions.slice(1));
 
                 if (validateRule.errors) {

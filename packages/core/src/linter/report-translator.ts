@@ -168,7 +168,7 @@ function mergeFixes(fixes: Fix[], sourceCode: SourceCode) {
  * @param {SourceCode} sourceCode The source code object to get text between fixes.
  * @returns {({text: string, range: number[]}|null)} The fix for the descriptor
  */
-function normalizeFixes(descriptor: MessageDescriptor, sourceCode: SourceCode) {
+function normalizeFixes(descriptor: Pick<MessageDescriptor, "fix">, sourceCode: SourceCode) {
     if (typeof descriptor.fix !== "function") {
         return null;
     }

@@ -9,7 +9,7 @@
 // Public Interface
 //------------------------------------------------------------------------------
 
-export = (text: string, data: Record<string, any>) => {
+export = (text: string, data?: Record<string, string>) => {
     if (!data) {
         return text;
     }

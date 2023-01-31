@@ -18,6 +18,12 @@ export interface Token extends Comment {
     type: string;
 }
 
+export namespace Token {
+    export function isAssignableFrom(token: unknown): token is Token {
+        return Comment.isAssignableFrom(token) && "type" in token;
+    }
+}
+
 export interface VisitorKeys {
     [nodeType: string]: string[];
 }
@@ -25,6 +31,12 @@ export interface Comment {
     value: string;
     range: [number, number];
     loc: SourceLocation;
+}
+
+export namespace Comment {
+    export function isAssignableFrom(comment: unknown): comment is Comment {
+        return !!comment && typeof comment === "object" && "value" in comment && "range" in comment && "loc" in comment;
+    }
 }
 
 export interface RuleFixer {
@@ -395,17 +407,6 @@ export interface SuppressedLintMessage {
  * @property {Array|Object} schema The option schema of the rule.
  * @property {"problem"|"suggestion"|"layout"} type The rule type.
  */
-
-// export interface RuleMeta {
-//     deprecated?: boolean;
-//     docs?: RuleMetaDocs;
-//     fixable?: 'code' | 'whitespace' | 'problem' | 'suggestion' | 'layout';
-//     hasSuggestions?: boolean;
-//     messages?: Record<string, string>;
-//     replacedBy?: string[];
-//     schema?: any[] | object;
-//     type: 'problem' | 'suggestion' | 'layout';
-// }
 
 /**
  * @typedef {Object} Rule

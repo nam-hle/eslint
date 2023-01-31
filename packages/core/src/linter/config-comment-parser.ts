@@ -12,7 +12,6 @@
 
 import { Legacy } from "@eslint/eslintrc";
 import Debug from "debug";
-// @ts-expect-error
 import levn from "levn";
 
 const { ConfigOps } = Legacy;
