@@ -11,7 +11,7 @@
 
 import util from "util";
 
-import { ConfigData, Environment, Processor, Rule, RuleConf, SeverityConf, SeverityNumber, SeverityString } from "@eslint/types";
+import { ConfigData, Environment, Processor, Rule, RuleConf, SeverityConf, SeverityMap, SeverityString } from "@eslint/types";
 import { ErrorObject, ValidateFunction } from "ajv";
 import { JSONSchema4 } from "json-schema";
 
@@ -34,11 +34,6 @@ const noop = Function.prototype;
 // Private
 //------------------------------------------------------------------------------
 let validateSchema: ValidateFunction;
-const severityMap: Record<SeverityString, SeverityNumber> = {
-    error: 2,
-    warn: 1,
-    off: 0
-};
 
 const validated = new WeakSet();
 
@@ -92,7 +87,7 @@ export default class ConfigValidator {
      */
     validateRuleSeverity(options: RuleConf): SeverityConf {
         const severity = Array.isArray(options) ? options[0] : options;
-        const normSeverity = typeof severity === "string" ? severityMap[severity.toLowerCase() as SeverityString] : severity;
+        const normSeverity = typeof severity === "string" ? SeverityMap[severity.toLowerCase() as SeverityString] : severity;
 
         if (normSeverity === 0 || normSeverity === 1 || normSeverity === 2) {
             return normSeverity;

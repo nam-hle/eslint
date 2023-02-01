@@ -22,7 +22,6 @@ import {
     ParserOptions,
     Rule,
     ScopeManager,
-    SeverityString,
     SuppressedLintMessage,
     Parser,
     Processor,
@@ -31,7 +30,9 @@ import {
     Token,
     ASTNode,
     SourceLocation,
-    type Scope as TypeScope
+    type Scope as TypeScope,
+    SeverityConf,
+    SeverityMap
 } from "@eslint/types";
 import Debug from "debug";
 import { analyze, Scope, Variable } from "eslint-scope";
@@ -104,13 +105,14 @@ const parserSymbol = Symbol.for("eslint.RuleTester.parser");
  * @property {string} justification The justification of directive
  */
 
-// interface DisableDirective {
-//     type: 'disable' | 'enable' | 'disable-line' | 'disable-next-line';
-//     line: number;
-//     column: number;
-//     ruleId: string | null;
-//     justification: string;
-// }
+interface DisableDirective {
+    type: "disable" | "enable" | "disable-line" | "disable-next-line";
+    line: number;
+    column: number;
+    ruleId: string | null;
+    justification: string;
+    parentComment?: { commentToken: Token; ruleIds: string[] };
+}
 
 /**
  * The private data for `Linter` instance.
@@ -335,7 +337,7 @@ function createMissingRuleMessage(ruleId: string) {
  * @returns {LintMessage} created problem, returns a missing-rule problem if only provided ruleId.
  * @private
  */
-function createLintingProblem(options: { ruleId: string; loc?: SourceLocation; message?: string; severity?: SeverityString }) {
+function createLintingProblem(options: { ruleId: string; loc?: SourceLocation; message?: string; severity?: SeverityConf }): LintMessage {
     const { ruleId = null, loc = DEFAULT_ERROR_LOC, message = createMissingRuleMessage(options.ruleId), severity = 2 } = options;
 
     return {
@@ -345,7 +347,7 @@ function createLintingProblem(options: { ruleId: string; loc?: SourceLocation; m
         column: loc.start.column + 1,
         endLine: loc.end.line,
         endColumn: loc.end.column + 1,
-        severity,
+        severity: typeof severity === "number" ? severity : SeverityMap[severity],
         nodeType: null
     };
 }
@@ -371,7 +373,7 @@ function createDisableDirectives(options: {
     const { commentToken, type, value, justification, ruleMapper } = options;
     const ruleIds = Object.keys(commentParser.parseListConfig(value));
     const directiveRules = ruleIds.length ? ruleIds : [null];
-    const result = {
+    const result: { directives: DisableDirective[]; directiveProblems: LintMessage[] } = {
         directives: [], // valid disable directives
         directiveProblems: [] // problems in directives
     };
@@ -382,7 +384,6 @@ function createDisableDirectives(options: {
         // push to directives, if the rule is defined(including null, e.g. /*eslint enable*/)
         if (ruleId === null || !!ruleMapper(ruleId)) {
             if (type === "disable-next-line") {
-                // @ts-expect-error
                 result.directives.push({
                     parentComment,
                     type,
@@ -392,7 +393,6 @@ function createDisableDirectives(options: {
                     justification
                 });
             } else {
-                // @ts-expect-error
                 result.directives.push({
                     parentComment,
                     type,
@@ -403,7 +403,6 @@ function createDisableDirectives(options: {
                 });
             }
         } else {
-            // @ts-expect-error
             result.directiveProblems.push(createLintingProblem({ ruleId, loc: commentToken.loc }));
         }
     }
@@ -479,7 +478,6 @@ function getDirectiveComments(ast: ASTNode, ruleMapper: any, warnInlineConfig: s
                         ruleId: null,
                         message: `'${kind}' has no effect because you have 'noInlineConfig' setting in ${warnInlineConfig}.`,
                         loc: comment.loc,
-                        // @ts-expect-error
                         severity: 1
                     })
                 );
@@ -1438,7 +1436,6 @@ class Linter {
             if (!slots.parserMap.has(config.parser)) {
                 return [
                     {
-                        // @ts-expect-error
                         ruleId: null,
                         fatal: true,
                         severity: 2,
@@ -1679,7 +1676,6 @@ class Linter {
 
             return [
                 {
-                    // @ts-expect-error
                     ruleId: null,
                     fatal: true,
                     severity: 2,
@@ -2061,7 +2057,6 @@ class Linter {
 
             return [
                 {
-                    // @ts-expect-error
                     ruleId: null,
                     fatal: true,
                     severity: 2,

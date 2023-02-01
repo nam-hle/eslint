@@ -8,6 +8,6 @@
         "moduleResolution": "node",
         "typeRoots": [ "../../node_modules/@eslint/types/src/types", "./node_modules/@types"]
     },
-    "include": ["src"],
+    "include": ["src", "test"],
     "exclude": ["**/node_modules", "**/.*/"]
 }
