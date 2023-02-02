@@ -1,6 +1,6 @@
 {
     "name": "@eslint/types",
-    "version": "1.4.1-beta.2",
+    "version": "8.32.0-SNAPSHOT",
     "description": "Types for ESLint",
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",

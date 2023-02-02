@@ -1,6 +1,6 @@
 {
   "name": "@eslint/eslintrc",
-  "version": "1.4.1-beta.2",
+  "version": "8.32.0-SNAPSHOT",
   "description": "The legacy ESLintRC config file format for ESLint",
   "type": "module",
   "main": "./bundle/eslintrc.cjs",
