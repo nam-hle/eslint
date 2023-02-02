@@ -9,16 +9,16 @@ permissions:
   contents: read
 
 jobs:
-  verify_files:
-    name: Verify Files
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: '16.x'
-    - name: Install Packages
-      run: npm install
+#  verify_files:
+#    name: Verify Files
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v3
+#    - uses: actions/setup-node@v3
+#      with:
+#        node-version: '16.x'
+#    - name: Install Packages
+#      run: npm install
 #    - name: Lint Files
 #      run: npm run lint
 #    - name: Check Rule Files
@@ -37,16 +37,7 @@ jobs:
 
   test_on_node:
     name: Test
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [16.x]
-#        include:
-#        - os: windows-latest
-#          node: "16.x"
-#        - os: macOS-latest
-#          node: "16.x"
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
@@ -54,10 +45,10 @@ jobs:
         node-version: ${{ matrix.node }}
     - name: Install Packages
       run: npm install
-    - name: Lint
-      run: npm run lint
     - name: Compile
       run: npm run compile
+    - name: Lint
+      run: npm run lint
     - name: Test
       run: npm run test
 #    - name: Fuzz Test
