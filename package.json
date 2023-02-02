@@ -6,14 +6,9 @@
     "description": "An AST-based pattern checker for JavaScript.",
     "scripts": {
         "test": "npm run test --ws --if-present",
-        "compile": "npm run compile:types && npm run compile:eslintrc && npm run compile:core",
-        "compile:types": "npm run compile --workspace=packages/types",
-        "compile:eslintrc": "npm run compile --workspace=packages/eslintrc",
-        "compile:core": "npm run compile --workspace=packages/core",
-        "start": "run-p start:*",
-        "start:core": "npm start --workspace=packages/core",
-        "start:eslintrc": "npm start --workspace=packages/eslintrc",
-        "lint": "eslint ./packages/*/src --ext .ts,.tsx --fix"
+        "compile": "npm run compile --ws",
+        "start": "npm run compile --ws",
+        "lint": "eslint ./packages/*/src --ext .ts,.tsx"
     },
     "repository": "eslint/eslint",
     "funding": "https://opencollective.com/eslint",
@@ -46,6 +41,8 @@
         "node": "^12.22.0 || ^14.17.0 || >=16.0.0"
     },
     "workspaces": [
-        "packages/*"
+        "packages/types",
+        "packages/eslintrc",
+        "packages/core"
     ]
 }
