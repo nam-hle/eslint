@@ -11,7 +11,7 @@
 
 import util from "util";
 
-import { ConfigData, Environment, Processor, Rule, RuleConf, SeverityConf, SeverityMap, SeverityString } from "@eslint/types";
+import { ConfigData, Environment, Processor, Rule, RuleConf, SeverityConf, SeverityNumber, SeverityString } from "@eslint/types";
 import { ErrorObject, ValidateFunction } from "ajv";
 import { JSONSchema4 } from "json-schema";
 
@@ -29,6 +29,12 @@ const ajv = ajvOrig();
 
 const ruleValidators = new WeakMap<Rule, ValidateFunction>();
 const noop = Function.prototype;
+
+export const SeverityMap: Record<SeverityString, SeverityNumber> = {
+    error: 2,
+    warn: 1,
+    off: 0
+};
 
 //------------------------------------------------------------------------------
 // Private

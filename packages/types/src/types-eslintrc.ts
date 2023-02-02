@@ -16,11 +16,6 @@ export type SeverityString = "off" | "warn" | "error";
 export type SeverityNumber = 0 | 1 | 2;
 export type SeverityConf = SeverityString | SeverityNumber;
 export type RuleConf = SeverityConf | [SeverityConf, ...unknown[]];
-export const SeverityMap: Record<SeverityString, SeverityNumber> = {
-    error: 2,
-    warn: 1,
-    off: 0
-};
 
 /**
  * @typedef {Object} EcmaFeatures

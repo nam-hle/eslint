@@ -31,9 +31,9 @@ import {
     ASTNode,
     SourceLocation,
     type Scope as TypeScope,
-    SeverityConf,
-    SeverityMap
+    SeverityConf
 } from "@eslint/types";
+import { SeverityString, SeverityNumber } from "@eslint/types";
 import Debug from "debug";
 import { analyze, Scope, Variable } from "eslint-scope";
 import { KEYS } from "eslint-visitor-keys";
@@ -74,6 +74,11 @@ const DEFAULT_ERROR_LOC: SourceLocation = {
     end: { line: 1, column: 1 }
 };
 const parserSymbol = Symbol.for("eslint.RuleTester.parser");
+export const SeverityMap: Record<SeverityString, SeverityNumber> = {
+    error: 2,
+    warn: 1,
+    off: 0
+};
 
 //------------------------------------------------------------------------------
 // Typedefs
